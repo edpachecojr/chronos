@@ -1,6 +1,4 @@
-using Chronos.Agenda.Domain.Compartilhado.Exceptions;
-
-namespace Chronos.Agenda.Domain.Agendamentos.Exceptions;
+namespace Chronos.Agenda.Domain.Compartilhado.Exceptions;
 
 /// <summary>Indica um endereço ausente ou fora do limite permitido.</summary>
 public sealed class EnderecoAtendimentoInvalidoException(int comprimento)

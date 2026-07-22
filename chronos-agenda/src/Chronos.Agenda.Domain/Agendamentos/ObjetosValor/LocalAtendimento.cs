@@ -1,3 +1,4 @@
+using Chronos.Agenda.Domain.Compartilhado.ObjetosValor;
 using Chronos.Agenda.Domain.Servicos.Enums;
 
 namespace Chronos.Agenda.Domain.Agendamentos.ObjetosValor;

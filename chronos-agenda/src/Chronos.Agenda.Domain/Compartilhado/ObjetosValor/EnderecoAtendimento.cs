@@ -1,6 +1,6 @@
-using Chronos.Agenda.Domain.Agendamentos.Exceptions;
+using Chronos.Agenda.Domain.Compartilhado.Exceptions;
 
-namespace Chronos.Agenda.Domain.Agendamentos.ObjetosValor;
+namespace Chronos.Agenda.Domain.Compartilhado.ObjetosValor;
 
 /// <summary>Representa o endereço físico informado para a prestação do serviço.</summary>
 public sealed record EnderecoAtendimento
