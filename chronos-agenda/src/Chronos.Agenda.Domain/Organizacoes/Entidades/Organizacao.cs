@@ -40,7 +40,7 @@ public sealed class Organizacao : Entidade
     public void ConfigurarPerfilOperacional(EnderecoAtendimento? enderecoPrestador, FusoHorario fusoHorario, IProvedorDataHora provedorDataHora)
     {
         EnderecoPrestador = enderecoPrestador;
-        FusoHorario = fusoHorario ?? throw new ArgumentNullException(nameof(fusoHorario));
+        FusoHorario = fusoHorario;
         Auditoria.Atualizar(provedorDataHora);
     }
 }

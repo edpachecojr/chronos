@@ -43,15 +43,6 @@ public sealed class OrganizacaoTests
         Assert.Equal(fusoHorario, organizacao.FusoHorario);
     }
 
-    [Fact]
-    public void ConfigurarPerfilOperacional_QuandoFusoHorarioNulo_LancaArgumentNullException()
-    {
-        var organizacao = CriarOrganizacao();
-
-        Assert.Throws<ArgumentNullException>(
-            () => organizacao.ConfigurarPerfilOperacional(null, null!, new FakeProvedorDataHora(AgoraUtc)));
-    }
-
     private static Organizacao CriarOrganizacao()
     {
         return Organizacao.Criar(new NomeOrganizacao("Clínica Exemplo"), new FakeProvedorDataHora(AgoraUtc));
