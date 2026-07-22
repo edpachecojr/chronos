@@ -1,5 +1,7 @@
-using Chronos.Agenda.Domain.Compartilhado;
-using Chronos.Agenda.Domain.Servicos;
+using Chronos.Agenda.Domain.Servicos.Entidades;
+using Chronos.Agenda.Domain.Servicos.Enumeracoes;
+using Chronos.Agenda.Domain.Servicos.Excecoes;
+using Chronos.Agenda.Domain.Servicos.ObjetosValor;
 
 namespace Chronos.Agenda.Domain.Tests.Servicos;
 
@@ -34,8 +36,8 @@ public sealed class ServicoTests
     [Theory]
     [InlineData(-0.01)]
     [InlineData(10.999)]
-    public void PrecoServico_QuandoInvalido_LancaExcecaoDeDominio(decimal valor)
+    public void PrecoServico_QuandoInvalido_LancaExcecaoEspecifica(decimal valor)
     {
-        Assert.Throws<DomainException>(() => new PrecoServico(valor));
+        Assert.Throws<PrecoServicoInvalidoException>(() => new PrecoServico(valor));
     }
 }

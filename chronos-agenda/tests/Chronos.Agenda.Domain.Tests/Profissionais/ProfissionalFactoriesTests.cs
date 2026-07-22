@@ -1,5 +1,7 @@
-using Chronos.Agenda.Domain.Compartilhado;
-using Chronos.Agenda.Domain.Profissionais;
+using Chronos.Agenda.Domain.Profissionais.Entidades;
+using Chronos.Agenda.Domain.Profissionais.EventosDominio;
+using Chronos.Agenda.Domain.Profissionais.Excecoes;
+using Chronos.Agenda.Domain.Profissionais.ObjetosValor;
 
 namespace Chronos.Agenda.Domain.Tests.Profissionais;
 
@@ -18,12 +20,12 @@ public sealed class ProfissionalFactoriesTests
     }
 
     [Fact]
-    public void Criar_QuandoOrganizacaoInvalida_LancaExcecaoDeDominio()
+    public void Criar_QuandoOrganizacaoInvalida_LancaExcecaoEspecifica()
     {
-        var excecao = Assert.Throws<DomainException>(
+        var excecao = Assert.Throws<OrganizacaoProfissionalInvalidaException>(
             () => Profissional.Criar(Guid.Empty, new NomeProfissional("Marina Costa"), AgoraUtc));
 
-        Assert.Equal("O profissional deve pertencer a uma organização válida.", excecao.Message);
+        Assert.Equal($"O profissional deve pertencer a uma organização válida; organização recebida: {Guid.Empty}.", excecao.Message);
     }
 
     [Fact]
@@ -33,7 +35,7 @@ public sealed class ProfissionalFactoriesTests
 
         var profissional = Profissional.Criar(organizacaoId, new NomeProfissional("Marina Costa"), AgoraUtc);
 
-        var evento = Assert.IsType<ProfissionalCriadoEventoDominio>(
+        var evento = Assert.IsType<ProfissionalCriado>(
             Assert.Single(profissional.ObterEventosDominio()));
         Assert.Equal(profissional.Id, evento.ProfissionalId);
         Assert.Equal(organizacaoId, evento.OrganizacaoId);

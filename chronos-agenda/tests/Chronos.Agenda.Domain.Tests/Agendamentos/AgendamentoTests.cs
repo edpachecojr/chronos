@@ -1,6 +1,9 @@
-using Chronos.Agenda.Domain.Agendamentos;
-using Chronos.Agenda.Domain.Compartilhado;
-using Chronos.Agenda.Domain.Servicos;
+using Chronos.Agenda.Domain.Agendamentos.Entidades;
+using Chronos.Agenda.Domain.Agendamentos.Enumeracoes;
+using Chronos.Agenda.Domain.Agendamentos.Excecoes;
+using Chronos.Agenda.Domain.Agendamentos.ObjetosValor;
+using Chronos.Agenda.Domain.Servicos.Enumeracoes;
+using Chronos.Agenda.Domain.Servicos.ObjetosValor;
 
 namespace Chronos.Agenda.Domain.Tests.Agendamentos;
 
@@ -56,23 +59,23 @@ public sealed class AgendamentoTests
     }
 
     [Fact]
-    public void Cancelar_QuandoJaCancelado_LancaExcecaoDeDominio()
+    public void Cancelar_QuandoJaCancelado_LancaExcecaoEspecifica()
     {
         var agendamento = CriarAgendamento(Guid.NewGuid(), AgoraUtc);
         agendamento.Cancelar(AgoraUtc.AddMinutes(1));
 
-        var excecao = Assert.Throws<DomainException>(() => agendamento.Cancelar(AgoraUtc.AddMinutes(2)));
+        var excecao = Assert.Throws<AgendamentoCanceladoException>(() => agendamento.Cancelar(AgoraUtc.AddMinutes(2)));
 
         Assert.Equal("Um agendamento cancelado não pode ser alterado.", excecao.Message);
     }
 
     [Fact]
-    public void Atualizar_QuandoCancelado_LancaExcecaoDeDominio()
+    public void Atualizar_QuandoCancelado_LancaExcecaoEspecifica()
     {
         var agendamento = CriarAgendamento(Guid.NewGuid(), AgoraUtc);
         agendamento.Cancelar(AgoraUtc.AddMinutes(1));
 
-        Assert.Throws<DomainException>(() => agendamento.Atualizar(
+        Assert.Throws<AgendamentoCanceladoException>(() => agendamento.Atualizar(
             new NomeCliente("Ana Souza"),
             CriarPeriodo(AgoraUtc.AddHours(2)),
             new PrecoServico(80m),

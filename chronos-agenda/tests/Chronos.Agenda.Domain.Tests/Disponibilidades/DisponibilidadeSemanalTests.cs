@@ -1,4 +1,6 @@
-using Chronos.Agenda.Domain.Disponibilidades;
+using Chronos.Agenda.Domain.Disponibilidades.Entidades;
+using Chronos.Agenda.Domain.Disponibilidades.Excecoes;
+using Chronos.Agenda.Domain.Disponibilidades.ObjetosValor;
 
 namespace Chronos.Agenda.Domain.Tests.Disponibilidades;
 
@@ -25,9 +27,9 @@ public sealed class DisponibilidadeSemanalTests
     }
 
     [Fact]
-    public void JanelaHorario_QuandoFimNaoEPosteriorAoInicio_LancaExcecaoDeDominio()
+    public void JanelaHorario_QuandoFimNaoEPosteriorAoInicio_LancaExcecaoEspecifica()
     {
-        Assert.Throws<Chronos.Agenda.Domain.Compartilhado.DomainException>(
+        Assert.Throws<JanelaHorarioInvalidaException>(
             () => new JanelaHorario(new TimeOnly(9, 0), new TimeOnly(9, 0)));
     }
 }
