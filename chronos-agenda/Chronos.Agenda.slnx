@@ -6,6 +6,7 @@
     <Project Path="src/Chronos.Agenda.Infrastructure/Chronos.Agenda.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Chronos.Agenda.Application.Tests/Chronos.Agenda.Application.Tests.csproj" />
     <Project Path="tests/Chronos.Agenda.Domain.Tests/Chronos.Agenda.Domain.Tests.csproj" />
   </Folder>
 </Solution>

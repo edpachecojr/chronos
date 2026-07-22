@@ -5,10 +5,13 @@ Solução .NET 10 do backend de agendamentos do Chronos.
 ## Estrutura
 
 - `src/Chronos.Agenda.Domain`: regras e modelo de negócio sem dependências externas;
-- `src/Chronos.Agenda.Application`: fronteira dos casos de uso, ainda sem implementação;
+- `src/Chronos.Agenda.Application`: fronteira dos casos de uso; hoje contém os
+  fundamentos transversais (portas de repositório e unidade de trabalho),
+  ainda sem os casos de uso em si;
 - `src/Chronos.Agenda.Infrastructure`: integrações técnicas, ainda sem implementação;
 - `src/Chronos.Agenda.Api`: host de endpoints, ainda sem endpoints;
-- `tests/Chronos.Agenda.Domain.Tests`: testes unitários do domínio.
+- `tests/Chronos.Agenda.Domain.Tests`: testes unitários do domínio;
+- `tests/Chronos.Agenda.Application.Tests`: testes unitários da aplicação.
 
 ## Modelo inicial
 
