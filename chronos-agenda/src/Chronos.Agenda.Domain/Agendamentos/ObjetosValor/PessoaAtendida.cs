@@ -12,6 +12,13 @@ public sealed record PessoaAtendida
         Tipo = tipo;
     }
 
+    /// <summary>Construtor sem parâmetros usado apenas pelo EF Core para materialização: <see cref="Nome"/> é, em
+    /// si, outro objeto de valor mapeado, e não pode ser vinculado a um parâmetro de construtor pelo EF Core.</summary>
+    private PessoaAtendida()
+    {
+        Nome = null!;
+    }
+
     public Nome Nome { get; }
     public TipoPessoaAtendida Tipo { get; }
 }

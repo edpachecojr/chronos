@@ -12,6 +12,12 @@ public sealed record LocalAtendimento
         Endereco = endereco;
     }
 
+    /// <summary>Construtor sem parâmetros usado apenas pelo EF Core para materialização: <see cref="Endereco"/> é,
+    /// em si, outro objeto de valor mapeado, e não pode ser vinculado a um parâmetro de construtor pelo EF Core.</summary>
+    private LocalAtendimento()
+    {
+    }
+
     public TipoAtendimento Tipo { get; }
     public EnderecoAtendimento? Endereco { get; }
 

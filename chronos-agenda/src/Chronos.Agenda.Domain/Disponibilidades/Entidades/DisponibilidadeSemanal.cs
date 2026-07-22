@@ -25,6 +25,12 @@ public sealed class DisponibilidadeSemanal : Entidade, IPertenceOrganizacao
         Janela = janela;
     }
 
+    /// <summary>Construtor sem parâmetros usado apenas pelo EF Core para materialização (ver <see cref="Entidade"/>).</summary>
+    private DisponibilidadeSemanal()
+    {
+        Janela = null!;
+    }
+
     public Guid OrganizacaoId { get; }
     public Guid ProfissionalId { get; }
     public DayOfWeek DiaDaSemana { get; private set; }

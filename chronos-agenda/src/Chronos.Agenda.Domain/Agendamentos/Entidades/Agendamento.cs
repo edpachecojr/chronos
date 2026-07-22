@@ -40,6 +40,16 @@ public sealed class Agendamento : Entidade, IPertenceOrganizacao
         Status = status;
     }
 
+    /// <summary>Construtor sem parâmetros usado apenas pelo EF Core para materialização (ver <see cref="Entidade"/>).</summary>
+    private Agendamento()
+    {
+        NomeServicoContratado = null!;
+        PessoaAtendida = null!;
+        Periodo = null!;
+        PrecoCobrado = null!;
+        Local = null!;
+    }
+
     public Guid OrganizacaoId { get; }
     public Guid ProfissionalId { get; }
     public Guid ServicoId { get; }

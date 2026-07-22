@@ -14,6 +14,15 @@ public abstract class Entidade : IEquatable<Entidade>
         Auditoria = auditoria;
     }
 
+    /// <summary>Construtor sem parâmetros usado apenas pelo EF Core para materializar a entidade a partir do
+    /// banco: objetos de valor do próprio agregado (ex.: <see cref="Auditoria"/>) não podem ser vinculados a
+    /// parâmetros de construtor pelo EF Core, que preenche os campos diretamente logo após a construção.</summary>
+    protected Entidade()
+    {
+        Id = default;
+        Auditoria = null!;
+    }
+
     public Guid Id { get; }
     public Auditoria Auditoria { get; }
 

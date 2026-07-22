@@ -15,6 +15,12 @@ public sealed class Organizacao : Entidade
         Nome = nome;
     }
 
+    /// <summary>Construtor sem parâmetros usado apenas pelo EF Core para materialização (ver <see cref="Entidade"/>).</summary>
+    private Organizacao()
+    {
+        Nome = null!;
+    }
+
     public NomeOrganizacao Nome { get; private set; }
     public EnderecoAtendimento? EnderecoPrestador { get; private set; }
     public FusoHorario? FusoHorario { get; private set; }

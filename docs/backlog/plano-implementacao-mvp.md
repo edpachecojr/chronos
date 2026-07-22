@@ -12,9 +12,14 @@
   para este escopo, a parte do ADR pendente #4 sobre horário ambíguo/inexistente;
   UC04 e UC05 compartilham preparação/validação via `AgendamentoPreparador`, e
   UC07 compartilha resolução de fuso e projeção diária via `ProjetorDeAgenda`,
-  ambos internos à feature `Agendamentos`)
+  ambos internos à feature `Agendamentos`; item 8 do sequenciamento concluído:
+  persistência EF Core/PostgreSQL, repositórios concretos, unidade de trabalho,
+  `ProvedorDataHoraUtc`, `IServicoAutenticacao`/`ServicoAutenticacao` sobre o
+  ASP.NET Core Identity e composição de `IContextoUsuario` na Api — ADR 0006
+  resolve o ADR pendente #2 quanto ao mecanismo de sessão (tokens de portador
+  do Identity); endpoints da Api seguem fora de escopo)
 - Escopo: Chronos Agenda
-- Base: `docs/backlog/dominio.md`, ADR 0001, ADR 0002, ADR 0003 e ADR 0005
+- Base: `docs/backlog/dominio.md`, ADR 0001, ADR 0002, ADR 0003, ADR 0005 e ADR 0006
 
 Este documento traduz os casos de uso do MVP em (1) o que o domínio atual já
 cobre, (2) o que falta no domínio para sustentar cada caso de uso, (3) um
@@ -446,8 +451,14 @@ Antes de qualquer caso de uso:
 7. ✅ Aplicação UC07 concluída (somente leitura; resolução de fuso e
    projeção diária extraídas para `ProjetorDeAgenda`, reaproveitado pelas
    consultas diária e semanal).
-8. Persistência EF Core/PostgreSQL e garantia transacional contra
-   sobreposição (**[ADR pendente #1]**) — Marco 2, item 4 de `dominio.md`.
+8. ✅ Persistência EF Core/PostgreSQL concluída: `ChronosAgendaDbContext`,
+   mapeamentos em `Data/Configuracoes` (convenção `snake_case` via
+   `EFCore.NamingConventions`), migration inicial em `Data/EF/Migrations`,
+   repositórios concretos, `UnidadeDeTrabalho`, `ProvedorDataHoraUtc`,
+   `IServicoAutenticacao`/`ServicoAutenticacao` sobre o ASP.NET Core Identity
+   e composição de `IContextoUsuario` por requisição na Api (ADR 0006). A
+   garantia transacional contra sobreposição sob concorrência real
+   (**[ADR pendente #1]**) segue em aberto — Marco 2, item 4 de `dominio.md`.
 
 ## 5. Decisões que bloqueiam partes deste plano
 
@@ -455,8 +466,8 @@ Reproduzido de `dominio.md`, mapeado ao que cada ADR destrava aqui:
 
 | ADR pendente | Bloqueia |
 | --- | --- |
-| #1 — garantia transacional de não sobreposição | Fechamento definitivo de UC04/UC05 sob concorrência real (RN02) |
-| #2 — mecanismo de autenticação/sessão e forma da associação usuário↔organização | Implementação concreta de `IMembroOrganizacaoRepositorio` em Infrastructure e composição do `ContextoUsuario` por requisição na Api (a parte de Application já está pronta, ver Fase 0); origem do `UsuarioId`/vínculo de proprietário em UC01 (ADR 0003 já decidiu que esse vínculo não é modelado no domínio, ver Fase A item 4) |
+| #1 — garantia transacional de não sobreposição | Fechamento definitivo de UC04/UC05 sob concorrência real (RN02); a checagem de conflito hoje é aplicação-only (`BuscarAtivosSobrepostosAsync` seguido de `Adicionar`/`Atualizar`), sem lock/constraint de banco |
+| #2 — mecanismo de autenticação/sessão e forma da associação usuário↔organização | **Resolvido pelo ADR 0006**: tokens de portador nativos do ASP.NET Core Identity, `IMembroOrganizacaoRepositorio` implementado sobre `membros_organizacao` e `IContextoUsuario` composto por `ResolucaoContextoUsuarioMiddleware` na Api. Papéis de autorização dentro desse vínculo (ex.: proprietário) seguem em aberto para quando um caso de uso concreto exigir (ver Fase A item 4) |
 | #3 — exclusão, retenção e dados pessoais | Política de exclusão de UC06/UC07 além do MVP (Marco 3) |
 | #4 — fuso horário e horários ambíguos/inexistentes | **Resolvido para UC04/UC05 pelo ADR 0005** (ver seção UC04 acima): entrada com offset explícito remove a ambiguidade na conversão local→UTC, e a conversão UTC→local (RN07) nunca foi ambígua. Os demais itens do ADR pendente #4 em `dominio.md` — bloqueios, feriados e exceções de disponibilidade — seguem em aberto, fora do escopo do MVP |
 | #5 — duração manual e snapshots comerciais | Campo opcional `DuracaoManualJustificativa`, ainda não adicionado ao snapshot da Fase B item 7 |

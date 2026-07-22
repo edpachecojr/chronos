@@ -20,6 +20,12 @@ public sealed class Profissional : Entidade, IPertenceOrganizacao
         Nome = nome;
     }
 
+    /// <summary>Construtor sem parâmetros usado apenas pelo EF Core para materialização (ver <see cref="Entidade"/>).</summary>
+    private Profissional()
+    {
+        Nome = null!;
+    }
+
     public Guid OrganizacaoId { get; }
     public Nome Nome { get; private set; }
 

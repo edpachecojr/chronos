@@ -30,6 +30,14 @@ public sealed class Servico : Entidade, IPertenceOrganizacao
         TipoAtendimento = tipoAtendimento;
     }
 
+    /// <summary>Construtor sem parâmetros usado apenas pelo EF Core para materialização (ver <see cref="Entidade"/>).</summary>
+    private Servico()
+    {
+        Nome = null!;
+        Duracao = null!;
+        Preco = null!;
+    }
+
     public Guid OrganizacaoId { get; }
     public Guid ProfissionalId { get; }
     public NomeServico Nome { get; private set; }
