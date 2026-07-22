@@ -1,23 +1,40 @@
 using Chronos.Agenda.Domain.Compartilhado.EventosDominio;
-using Chronos.Agenda.Domain.Compartilhado.Exceptions;
+using Chronos.Agenda.Domain.Compartilhado.ObjetosValor;
 
 namespace Chronos.Agenda.Domain.Compartilhado.Entidades;
 
-/// <summary>Representa um objeto do domínio com identidade e auditoria comuns.</summary>
-public abstract class Entidade
+/// <summary>Representa um objeto do domínio com identidade, auditoria e eventos comuns.</summary>
+public abstract class Entidade : IEquatable<Entidade>
 {
     private readonly List<IEventoDominio> eventosDominio = [];
 
-    protected Entidade(Guid id, DateTime criadoEmUtc, DateTime atualizadoEmUtc)
+    protected Entidade(Guid id, Auditoria auditoria)
     {
         Id = id;
-        CriadoEmUtc = criadoEmUtc;
-        AtualizadoEmUtc = atualizadoEmUtc;
+        Auditoria = auditoria;
     }
 
     public Guid Id { get; }
-    public DateTime CriadoEmUtc { get; }
-    public DateTime AtualizadoEmUtc { get; private set; }
+    public Auditoria Auditoria { get; }
+
+    /// <summary>Compara esta entidade com outra por sua identidade.</summary>
+    /// <example><code>var saoIguais = primeira.Equals(segunda);</code></example>
+    public bool Equals(Entidade? outra)
+    {
+        return outra is not null && Id == outra.Id;
+    }
+
+    /// <inheritdoc />
+    public override bool Equals(object? objeto)
+    {
+        return objeto is Entidade outra && Equals(outra);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
 
     /// <summary>Obtém os eventos de domínio ainda não processados da entidade.</summary>
     /// <example><code>var eventos = entidade.ObterEventosDominio();</code></example>
@@ -40,29 +57,4 @@ public abstract class Entidade
         eventosDominio.Add(eventoDominio);
     }
 
-    protected static void ValidarCriacao(DateTime criadoEmUtc)
-    {
-        ExigirUtc(criadoEmUtc, nameof(criadoEmUtc));
-    }
-
-    protected void RegistrarAtualizacao(DateTime atualizadoEmUtc)
-    {
-        var instante = ExigirUtc(atualizadoEmUtc, nameof(atualizadoEmUtc));
-        if (instante < CriadoEmUtc)
-        {
-            throw new AtualizacaoAnteriorCriacaoException(CriadoEmUtc, instante);
-        }
-
-        AtualizadoEmUtc = instante;
-    }
-
-    private static DateTime ExigirUtc(DateTime instante, string nomeParametro)
-    {
-        if (instante.Kind != DateTimeKind.Utc)
-        {
-            throw new InstanteDeveEstarEmUtcException(nomeParametro, instante.Kind);
-        }
-
-        return instante;
-    }
 }

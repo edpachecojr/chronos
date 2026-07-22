@@ -1,5 +1,6 @@
 using Chronos.Agenda.Domain.Compartilhado.Contratos;
 using Chronos.Agenda.Domain.Compartilhado.Entidades;
+using Chronos.Agenda.Domain.Compartilhado.ObjetosValor;
 using Chronos.Agenda.Domain.Profissionais.EventosDominio;
 using Chronos.Agenda.Domain.Profissionais.Exceptions;
 using Chronos.Agenda.Domain.Profissionais.ObjetosValor;
@@ -13,9 +14,8 @@ public sealed class Profissional : Entidade, IPertenceOrganizacao
         Guid id,
         Guid organizacaoId,
         NomeProfissional nome,
-        DateTime criadoEmUtc,
-        DateTime atualizadoEmUtc)
-        : base(id, criadoEmUtc, atualizadoEmUtc)
+        Auditoria auditoria)
+        : base(id, auditoria)
     {
         OrganizacaoId = organizacaoId;
         Nome = nome;
@@ -25,27 +25,20 @@ public sealed class Profissional : Entidade, IPertenceOrganizacao
     public NomeProfissional Nome { get; private set; }
 
     /// <summary>Cria um novo profissional vinculado a uma organização.</summary>
-    /// <example><code>var profissional = Profissional.Criar(organizacaoId, nome, agoraUtc);</code></example>
-    public static Profissional Criar(Guid organizacaoId, NomeProfissional nome, DateTime criadoEmUtc)
+    /// <example><code>var profissional = Profissional.Criar(organizacaoId, nome, provedorDataHora);</code></example>
+    public static Profissional Criar(Guid organizacaoId, NomeProfissional nome, IProvedorDataHora provedorDataHora)
     {
-        ValidarCriacao(criadoEmUtc);
         ValidarOrganizacao(organizacaoId);
-        var profissional = new Profissional(Guid.NewGuid(), organizacaoId, nome, criadoEmUtc, criadoEmUtc);
-        profissional.LancarEventoDominio(new ProfissionalCriado(profissional.Id, organizacaoId, criadoEmUtc));
+        var auditoria = Auditoria.Criar(provedorDataHora);
+        var profissional = new Profissional(Guid.NewGuid(), organizacaoId, nome, auditoria);
+        profissional.LancarEventoDominio(new ProfissionalCriado(profissional.Id, organizacaoId, auditoria.CriadoEmUtc));
         return profissional;
     }
 
-    /// <summary>Reconstitui um profissional previamente persistido, sem executar regras de criação.</summary>
-    /// <example><code>var profissional = Profissional.Reidratar(id, organizacaoId, nome, criadoEmUtc, atualizadoEmUtc);</code></example>
-    public static Profissional Reidratar(Guid id, Guid organizacaoId, NomeProfissional nome, DateTime criadoEmUtc, DateTime atualizadoEmUtc)
-    {
-        return new Profissional(id, organizacaoId, nome, criadoEmUtc, atualizadoEmUtc);
-    }
-
-    public void Renomear(NomeProfissional nome, DateTime atualizadoEmUtc)
+    public void Renomear(NomeProfissional nome, IProvedorDataHora provedorDataHora)
     {
         Nome = nome;
-        RegistrarAtualizacao(atualizadoEmUtc);
+        Auditoria.Atualizar(provedorDataHora);
     }
 
     private static void ValidarOrganizacao(Guid organizacaoId)

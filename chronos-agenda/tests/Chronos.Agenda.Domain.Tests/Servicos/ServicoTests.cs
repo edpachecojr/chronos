@@ -2,6 +2,7 @@ using Chronos.Agenda.Domain.Servicos.Entidades;
 using Chronos.Agenda.Domain.Servicos.Enums;
 using Chronos.Agenda.Domain.Servicos.Exceptions;
 using Chronos.Agenda.Domain.Servicos.ObjetosValor;
+using Chronos.Agenda.Domain.Tests.Compartilhado;
 
 namespace Chronos.Agenda.Domain.Tests.Servicos;
 
@@ -11,6 +12,7 @@ public sealed class ServicoTests
     public void Atualizar_SubstituiConfiguracaoComercial()
     {
         var criadoEmUtc = new DateTime(2026, 7, 21, 12, 0, 0, DateTimeKind.Utc);
+        var provedorDataHora = new FakeProvedorDataHora(criadoEmUtc);
         var servico = Servico.Criar(
             Guid.NewGuid(),
             Guid.NewGuid(),
@@ -18,14 +20,16 @@ public sealed class ServicoTests
             new DuracaoServico(TimeSpan.FromMinutes(30)),
             new PrecoServico(50m),
             TipoAtendimento.Presencial,
-            criadoEmUtc);
+            provedorDataHora);
+
+        provedorDataHora.UtcNow = criadoEmUtc.AddMinutes(1);
 
         servico.Atualizar(
             new NomeServico("Corte e barba"),
             new DuracaoServico(TimeSpan.FromMinutes(60)),
             new PrecoServico(90m),
             TipoAtendimento.Domiciliar,
-            criadoEmUtc.AddMinutes(1));
+            provedorDataHora);
 
         Assert.Equal("Corte e barba", servico.Nome.Valor);
         Assert.Equal(TimeSpan.FromMinutes(60), servico.Duracao.Valor);

@@ -1,5 +1,6 @@
 using Chronos.Agenda.Domain.Compartilhado.Contratos;
 using Chronos.Agenda.Domain.Compartilhado.Entidades;
+using Chronos.Agenda.Domain.Compartilhado.ObjetosValor;
 using Chronos.Agenda.Domain.Disponibilidades.EventosDominio;
 using Chronos.Agenda.Domain.Disponibilidades.Exceptions;
 using Chronos.Agenda.Domain.Disponibilidades.ObjetosValor;
@@ -15,9 +16,8 @@ public sealed class DisponibilidadeSemanal : Entidade, IPertenceOrganizacao
         Guid profissionalId,
         DayOfWeek diaDaSemana,
         JanelaHorario janela,
-        DateTime criadoEmUtc,
-        DateTime atualizadoEmUtc)
-        : base(id, criadoEmUtc, atualizadoEmUtc)
+        Auditoria auditoria)
+        : base(id, auditoria)
     {
         OrganizacaoId = organizacaoId;
         ProfissionalId = profissionalId;
@@ -31,30 +31,23 @@ public sealed class DisponibilidadeSemanal : Entidade, IPertenceOrganizacao
     public JanelaHorario Janela { get; private set; }
 
     /// <summary>Cria uma nova disponibilidade semanal para um profissional.</summary>
-    /// <example><code>var disponibilidade = DisponibilidadeSemanal.Criar(organizacaoId, profissionalId, DayOfWeek.Monday, janela, agoraUtc);</code></example>
-    public static DisponibilidadeSemanal Criar(Guid organizacaoId, Guid profissionalId, DayOfWeek diaDaSemana, JanelaHorario janela, DateTime criadoEmUtc)
+    /// <example><code>var disponibilidade = DisponibilidadeSemanal.Criar(organizacaoId, profissionalId, DayOfWeek.Monday, janela, provedorDataHora);</code></example>
+    public static DisponibilidadeSemanal Criar(Guid organizacaoId, Guid profissionalId, DayOfWeek diaDaSemana, JanelaHorario janela, IProvedorDataHora provedorDataHora)
     {
-        ValidarCriacao(criadoEmUtc);
         ValidarPropriedade(organizacaoId, profissionalId);
-        var disponibilidade = new DisponibilidadeSemanal(Guid.NewGuid(), organizacaoId, profissionalId, diaDaSemana, janela, criadoEmUtc, criadoEmUtc);
-        disponibilidade.LancarEventoDominio(new DisponibilidadeSemanalCriada(disponibilidade.Id, organizacaoId, profissionalId, criadoEmUtc));
+        var auditoria = Auditoria.Criar(provedorDataHora);
+        var disponibilidade = new DisponibilidadeSemanal(Guid.NewGuid(), organizacaoId, profissionalId, diaDaSemana, janela, auditoria);
+        disponibilidade.LancarEventoDominio(new DisponibilidadeSemanalCriada(disponibilidade.Id, organizacaoId, profissionalId, auditoria.CriadoEmUtc));
         return disponibilidade;
     }
 
-    /// <summary>Reconstitui uma disponibilidade previamente persistida, sem executar regras de criação.</summary>
-    /// <example><code>var disponibilidade = DisponibilidadeSemanal.Reidratar(id, organizacaoId, profissionalId, DayOfWeek.Monday, janela, criadoEmUtc, atualizadoEmUtc);</code></example>
-    public static DisponibilidadeSemanal Reidratar(Guid id, Guid organizacaoId, Guid profissionalId, DayOfWeek diaDaSemana, JanelaHorario janela, DateTime criadoEmUtc, DateTime atualizadoEmUtc)
-    {
-        return new DisponibilidadeSemanal(id, organizacaoId, profissionalId, diaDaSemana, janela, criadoEmUtc, atualizadoEmUtc);
-    }
-
     /// <summary>Altera o dia ou a janela de atendimento configurada.</summary>
-    /// <example><code>disponibilidade.Reagendar(DayOfWeek.Monday, janela, agoraUtc);</code></example>
-    public void Reagendar(DayOfWeek diaDaSemana, JanelaHorario janela, DateTime atualizadoEmUtc)
+    /// <example><code>disponibilidade.Reagendar(DayOfWeek.Monday, janela, provedorDataHora);</code></example>
+    public void Reagendar(DayOfWeek diaDaSemana, JanelaHorario janela, IProvedorDataHora provedorDataHora)
     {
         DiaDaSemana = diaDaSemana;
         Janela = janela;
-        RegistrarAtualizacao(atualizadoEmUtc);
+        Auditoria.Atualizar(provedorDataHora);
     }
 
     private static void ValidarPropriedade(Guid organizacaoId, Guid profissionalId)

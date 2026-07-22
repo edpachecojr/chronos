@@ -1,5 +1,6 @@
 using Chronos.Agenda.Domain.Compartilhado.Contratos;
 using Chronos.Agenda.Domain.Compartilhado.Entidades;
+using Chronos.Agenda.Domain.Compartilhado.ObjetosValor;
 using Chronos.Agenda.Domain.Servicos.Enums;
 using Chronos.Agenda.Domain.Servicos.EventosDominio;
 using Chronos.Agenda.Domain.Servicos.Exceptions;
@@ -18,9 +19,8 @@ public sealed class Servico : Entidade, IPertenceOrganizacao
         DuracaoServico duracao,
         PrecoServico preco,
         TipoAtendimento tipoAtendimento,
-        DateTime criadoEmUtc,
-        DateTime atualizadoEmUtc)
-        : base(id, criadoEmUtc, atualizadoEmUtc)
+        Auditoria auditoria)
+        : base(id, auditoria)
     {
         OrganizacaoId = organizacaoId;
         ProfissionalId = profissionalId;
@@ -38,37 +38,30 @@ public sealed class Servico : Entidade, IPertenceOrganizacao
     public TipoAtendimento TipoAtendimento { get; private set; }
 
     /// <summary>Cria um novo serviço oferecido por um profissional.</summary>
-    /// <example><code>var servico = Servico.Criar(organizacaoId, profissionalId, nome, duracao, preco, tipo, agoraUtc);</code></example>
-    public static Servico Criar(Guid organizacaoId, Guid profissionalId, NomeServico nome, DuracaoServico duracao, PrecoServico preco, TipoAtendimento tipoAtendimento, DateTime criadoEmUtc)
+    /// <example><code>var servico = Servico.Criar(organizacaoId, profissionalId, nome, duracao, preco, tipo, provedorDataHora);</code></example>
+    public static Servico Criar(Guid organizacaoId, Guid profissionalId, NomeServico nome, DuracaoServico duracao, PrecoServico preco, TipoAtendimento tipoAtendimento, IProvedorDataHora provedorDataHora)
     {
-        ValidarCriacao(criadoEmUtc);
         ValidarPropriedade(organizacaoId, profissionalId);
-        var servico = new Servico(Guid.NewGuid(), organizacaoId, profissionalId, nome, duracao, preco, tipoAtendimento, criadoEmUtc, criadoEmUtc);
-        servico.LancarEventoDominio(new ServicoCriado(servico.Id, organizacaoId, profissionalId, criadoEmUtc));
+        var auditoria = Auditoria.Criar(provedorDataHora);
+        var servico = new Servico(Guid.NewGuid(), organizacaoId, profissionalId, nome, duracao, preco, tipoAtendimento, auditoria);
+        servico.LancarEventoDominio(new ServicoCriado(servico.Id, organizacaoId, profissionalId, auditoria.CriadoEmUtc));
         return servico;
     }
 
-    /// <summary>Reconstitui um serviço previamente persistido, sem executar regras de criação.</summary>
-    /// <example><code>var servico = Servico.Reidratar(id, organizacaoId, profissionalId, nome, duracao, preco, tipo, criadoEmUtc, atualizadoEmUtc);</code></example>
-    public static Servico Reidratar(Guid id, Guid organizacaoId, Guid profissionalId, NomeServico nome, DuracaoServico duracao, PrecoServico preco, TipoAtendimento tipoAtendimento, DateTime criadoEmUtc, DateTime atualizadoEmUtc)
-    {
-        return new Servico(id, organizacaoId, profissionalId, nome, duracao, preco, tipoAtendimento, criadoEmUtc, atualizadoEmUtc);
-    }
-
     /// <summary>Atualiza a configuração comercial de um serviço.</summary>
-    /// <example><code>servico.Atualizar(nome, duracao, preco, TipoAtendimento.Online, agoraUtc);</code></example>
+    /// <example><code>servico.Atualizar(nome, duracao, preco, TipoAtendimento.Online, provedorDataHora);</code></example>
     public void Atualizar(
         NomeServico nome,
         DuracaoServico duracao,
         PrecoServico preco,
         TipoAtendimento tipoAtendimento,
-        DateTime atualizadoEmUtc)
+        IProvedorDataHora provedorDataHora)
     {
         Nome = nome;
         Duracao = duracao;
         Preco = preco;
         TipoAtendimento = tipoAtendimento;
-        RegistrarAtualizacao(atualizadoEmUtc);
+        Auditoria.Atualizar(provedorDataHora);
     }
 
     private static void ValidarPropriedade(Guid organizacaoId, Guid profissionalId)
