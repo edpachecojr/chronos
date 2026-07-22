@@ -27,7 +27,31 @@ public sealed class ProfissionalFactoriesTests
     }
 
     [Fact]
-    public void Reidratar_PreservaEstadoPersistidoSemExecutarRegrasDeCriacao()
+    public void Criar_LancaEventoDeDominio()
+    {
+        var organizacaoId = Guid.NewGuid();
+
+        var profissional = Profissional.Criar(organizacaoId, new NomeProfissional("Marina Costa"), AgoraUtc);
+
+        var evento = Assert.IsType<ProfissionalCriadoEventoDominio>(
+            Assert.Single(profissional.ObterEventosDominio()));
+        Assert.Equal(profissional.Id, evento.ProfissionalId);
+        Assert.Equal(organizacaoId, evento.OrganizacaoId);
+        Assert.Equal(AgoraUtc, evento.OcorridoEmUtc);
+    }
+
+    [Fact]
+    public void LimparEventosDominio_RemoveEventosPendentes()
+    {
+        var profissional = Profissional.Criar(Guid.NewGuid(), new NomeProfissional("Marina Costa"), AgoraUtc);
+
+        profissional.LimparEventosDominio();
+
+        Assert.Empty(profissional.ObterEventosDominio());
+    }
+
+    [Fact]
+    public void Reidratar_PreservaEstadoPersistidoSemExecutarRegrasDeCriacaoOuLancarEventos()
     {
         var id = Guid.NewGuid();
         var atualizadoEmUtc = AgoraUtc.AddMinutes(5);
@@ -42,5 +66,6 @@ public sealed class ProfissionalFactoriesTests
         Assert.Equal(id, profissional.Id);
         Assert.Equal(Guid.Empty, profissional.OrganizacaoId);
         Assert.Equal(atualizadoEmUtc, profissional.AtualizadoEmUtc);
+        Assert.Empty(profissional.ObterEventosDominio());
     }
 }

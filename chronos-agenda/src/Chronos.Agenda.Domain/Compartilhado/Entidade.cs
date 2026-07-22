@@ -3,6 +3,8 @@ namespace Chronos.Agenda.Domain.Compartilhado;
 /// <summary>Representa um objeto do domínio com identidade e auditoria comuns.</summary>
 public abstract class Entidade
 {
+    private readonly List<IEventoDominio> eventosDominio = [];
+
     protected Entidade(Guid id, DateTime criadoEmUtc, DateTime atualizadoEmUtc)
     {
         Id = id;
@@ -13,6 +15,27 @@ public abstract class Entidade
     public Guid Id { get; }
     public DateTime CriadoEmUtc { get; }
     public DateTime AtualizadoEmUtc { get; private set; }
+
+    /// <summary>Obtém os eventos de domínio ainda não processados da entidade.</summary>
+    /// <example><code>var eventos = entidade.ObterEventosDominio();</code></example>
+    public IReadOnlyCollection<IEventoDominio> ObterEventosDominio()
+    {
+        return eventosDominio.AsReadOnly();
+    }
+
+    /// <summary>Remove os eventos de domínio que já foram processados.</summary>
+    /// <example><code>entidade.LimparEventosDominio();</code></example>
+    public void LimparEventosDominio()
+    {
+        eventosDominio.Clear();
+    }
+
+    /// <summary>Registra um fato de domínio produzido pela entidade.</summary>
+    /// <example><code>LancarEventoDominio(evento);</code></example>
+    protected void LancarEventoDominio(IEventoDominio eventoDominio)
+    {
+        eventosDominio.Add(eventoDominio);
+    }
 
     protected static void ValidarCriacao(DateTime criadoEmUtc)
     {

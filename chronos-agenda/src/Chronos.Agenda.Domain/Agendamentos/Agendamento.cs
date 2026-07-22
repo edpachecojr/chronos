@@ -45,7 +45,9 @@ public sealed class Agendamento : Entidade, IPertenceOrganizacao
     {
         ValidarCriacao(criadoEmUtc);
         ValidarReferencias(organizacaoId, profissionalId, servicoId);
-        return new Agendamento(Guid.NewGuid(), organizacaoId, profissionalId, servicoId, cliente, periodo, precoCobrado, tipoAtendimento, criadoEmUtc, criadoEmUtc, StatusAgendamento.Pendente);
+        var agendamento = new Agendamento(Guid.NewGuid(), organizacaoId, profissionalId, servicoId, cliente, periodo, precoCobrado, tipoAtendimento, criadoEmUtc, criadoEmUtc, StatusAgendamento.Pendente);
+        agendamento.LancarEventoDominio(new AgendamentoCriadoEventoDominio(agendamento.Id, organizacaoId, profissionalId, servicoId, criadoEmUtc));
+        return agendamento;
     }
 
     /// <summary>Reconstitui um agendamento previamente persistido, sem executar regras de criação.</summary>

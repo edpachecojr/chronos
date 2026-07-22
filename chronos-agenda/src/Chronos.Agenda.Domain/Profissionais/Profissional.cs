@@ -26,7 +26,9 @@ public sealed class Profissional : Entidade, IPertenceOrganizacao
     {
         ValidarCriacao(criadoEmUtc);
         ValidarOrganizacao(organizacaoId);
-        return new Profissional(Guid.NewGuid(), organizacaoId, nome, criadoEmUtc, criadoEmUtc);
+        var profissional = new Profissional(Guid.NewGuid(), organizacaoId, nome, criadoEmUtc, criadoEmUtc);
+        profissional.LancarEventoDominio(new ProfissionalCriadoEventoDominio(profissional.Id, organizacaoId, criadoEmUtc));
+        return profissional;
     }
 
     /// <summary>Reconstitui um profissional previamente persistido, sem executar regras de criação.</summary>

@@ -18,7 +18,9 @@ public sealed class Organizacao : Entidade
     public static Organizacao Criar(NomeOrganizacao nome, DateTime criadoEmUtc)
     {
         ValidarCriacao(criadoEmUtc);
-        return new Organizacao(Guid.NewGuid(), nome, criadoEmUtc, criadoEmUtc);
+        var organizacao = new Organizacao(Guid.NewGuid(), nome, criadoEmUtc, criadoEmUtc);
+        organizacao.LancarEventoDominio(new OrganizacaoCriadaEventoDominio(organizacao.Id, criadoEmUtc));
+        return organizacao;
     }
 
     /// <summary>Reconstitui uma organização previamente persistida, sem executar regras de criação.</summary>

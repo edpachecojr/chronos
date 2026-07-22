@@ -32,7 +32,9 @@ public sealed class DisponibilidadeSemanal : Entidade, IPertenceOrganizacao
     {
         ValidarCriacao(criadoEmUtc);
         ValidarPropriedade(organizacaoId, profissionalId);
-        return new DisponibilidadeSemanal(Guid.NewGuid(), organizacaoId, profissionalId, diaDaSemana, janela, criadoEmUtc, criadoEmUtc);
+        var disponibilidade = new DisponibilidadeSemanal(Guid.NewGuid(), organizacaoId, profissionalId, diaDaSemana, janela, criadoEmUtc, criadoEmUtc);
+        disponibilidade.LancarEventoDominio(new DisponibilidadeSemanalCriadaEventoDominio(disponibilidade.Id, organizacaoId, profissionalId, criadoEmUtc));
+        return disponibilidade;
     }
 
     /// <summary>Reconstitui uma disponibilidade previamente persistida, sem executar regras de criação.</summary>

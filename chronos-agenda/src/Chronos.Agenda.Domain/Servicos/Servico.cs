@@ -38,7 +38,9 @@ public sealed class Servico : Entidade, IPertenceOrganizacao
     {
         ValidarCriacao(criadoEmUtc);
         ValidarPropriedade(organizacaoId, profissionalId);
-        return new Servico(Guid.NewGuid(), organizacaoId, profissionalId, nome, duracao, preco, tipoAtendimento, criadoEmUtc, criadoEmUtc);
+        var servico = new Servico(Guid.NewGuid(), organizacaoId, profissionalId, nome, duracao, preco, tipoAtendimento, criadoEmUtc, criadoEmUtc);
+        servico.LancarEventoDominio(new ServicoCriadoEventoDominio(servico.Id, organizacaoId, profissionalId, criadoEmUtc));
+        return servico;
     }
 
     /// <summary>Reconstitui um serviço previamente persistido, sem executar regras de criação.</summary>
