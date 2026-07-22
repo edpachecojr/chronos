@@ -97,7 +97,16 @@ ser discutida e atualizada explicitamente, junto com os ADRs afetados.
 - Siga as convenções dos frameworks escolhidos e mantenha caminhos previsíveis.
 - Prefira módulos pequenos e focados; não crie arquivos ou classes que concentrem
   responsabilidades distintas.
-- Não introduza uma nova convenção de diretórios sem atualizar este documento.
+- No domínio, cada feature é organizada por intenção: `Entidades`,
+  `ObjetosValor`, `Enumeracoes`, `EventosDominio` e `Excecoes`, conforme se
+  aplicarem. `Compartilhado` segue a mesma regra com `Entidades`, `Contratos`,
+  `EventosDominio` e `Excecoes`.
+- Namespaces devem acompanhar essa estrutura de diretórios. Eventos dentro de
+  `EventosDominio` não recebem o sufixo redundante `EventoDominio`; a interface
+  compartilhada `IEventoDominio` preserva o nome que comunica seu papel.
+- Exceções de domínio devem ser tipos específicos da feature ou da intenção
+  compartilhada; `DomainException` é apenas a base abstrata comum e nunca deve
+  ser lançada diretamente.
 
 ## Formatação
 
