@@ -30,4 +30,27 @@ public sealed class FusoHorarioTests
             "O fuso horário deve ser um identificador IANA reconhecido; identificador recebido: 'Regiao/Inexistente'.",
             excecao.Message);
     }
+
+    [Fact]
+    public void ConverterParaLocal_QuandoHorarioPadrao_AplicaOffsetCorreto()
+    {
+        var fusoHorario = new FusoHorario("America/Sao_Paulo");
+        var instanteUtc = new DateTime(2026, 7, 21, 12, 0, 0, DateTimeKind.Utc);
+
+        var instanteLocal = fusoHorario.ConverterParaLocal(instanteUtc);
+
+        Assert.Equal(new DateTime(2026, 7, 21, 9, 0, 0), instanteLocal.DateTime);
+        Assert.Equal(TimeSpan.FromHours(-3), instanteLocal.Offset);
+    }
+
+    [Fact]
+    public void ConverterParaLocal_QuandoInstanteSemMarcacaoUtc_ConverteMesmoAssim()
+    {
+        var fusoHorario = new FusoHorario("America/Sao_Paulo");
+        var instanteUtc = new DateTime(2026, 7, 21, 12, 0, 0, DateTimeKind.Unspecified);
+
+        var instanteLocal = fusoHorario.ConverterParaLocal(instanteUtc);
+
+        Assert.Equal(new DateTime(2026, 7, 21, 9, 0, 0), instanteLocal.DateTime);
+    }
 }
