@@ -1,5 +1,6 @@
 using Chronos.Agenda.Domain.Agendamentos.Entidades;
 using Chronos.Agenda.Domain.Agendamentos.Enums;
+using Chronos.Agenda.Domain.Agendamentos.Erros;
 using Chronos.Agenda.Domain.Agendamentos.Exceptions;
 using Chronos.Agenda.Domain.Agendamentos.ObjetosValor;
 using Chronos.Agenda.Domain.Compartilhado.ObjetosValor;
@@ -103,30 +104,47 @@ public sealed class AgendamentoTests
     }
 
     [Fact]
-    public void Cancelar_QuandoJaCancelado_LancaExcecaoEspecifica()
+    public void Confirmar_QuandoNaoPendente_RetornaFalhaComErroEspecifico()
     {
         var agendamento = CriarAgendamento(Guid.NewGuid(), CriarPeriodo(AgoraUtc));
         var provedorDataHora = new FakeProvedorDataHora(AgoraUtc.AddMinutes(1));
-        agendamento.Cancelar(provedorDataHora);
+        agendamento.Confirmar(provedorDataHora);
 
-        var excecao = Assert.Throws<AgendamentoCanceladoException>(() => agendamento.Cancelar(provedorDataHora));
+        var resultado = agendamento.Confirmar(provedorDataHora);
 
-        Assert.Equal("Um agendamento cancelado não pode ser alterado.", excecao.Message);
+        Assert.True(resultado.Falhou);
+        Assert.Equal(AgendamentoErros.ConfirmacaoInvalida(StatusAgendamento.Confirmado), resultado.Erro);
     }
 
     [Fact]
-    public void Atualizar_QuandoCancelado_LancaExcecaoEspecifica()
+    public void Cancelar_QuandoJaCancelado_RetornaFalhaComErroEspecifico()
     {
         var agendamento = CriarAgendamento(Guid.NewGuid(), CriarPeriodo(AgoraUtc));
         var provedorDataHora = new FakeProvedorDataHora(AgoraUtc.AddMinutes(1));
         agendamento.Cancelar(provedorDataHora);
 
-        Assert.Throws<AgendamentoCanceladoException>(() => agendamento.Atualizar(
+        var resultado = agendamento.Cancelar(provedorDataHora);
+
+        Assert.True(resultado.Falhou);
+        Assert.Equal(AgendamentoErros.JaCancelado, resultado.Erro);
+    }
+
+    [Fact]
+    public void Atualizar_QuandoCancelado_RetornaFalhaComErroEspecifico()
+    {
+        var agendamento = CriarAgendamento(Guid.NewGuid(), CriarPeriodo(AgoraUtc));
+        var provedorDataHora = new FakeProvedorDataHora(AgoraUtc.AddMinutes(1));
+        agendamento.Cancelar(provedorDataHora);
+
+        var resultado = agendamento.Atualizar(
             new PessoaAtendida(new Nome("Ana Souza"), TipoPessoaAtendida.Cliente),
             CriarPeriodo(AgoraUtc.AddHours(2)),
             new PrecoServico(80m),
             LocalAtendimento.Online(),
-            provedorDataHora));
+            provedorDataHora);
+
+        Assert.True(resultado.Falhou);
+        Assert.Equal(AgendamentoErros.JaCancelado, resultado.Erro);
     }
 
     [Fact]
@@ -151,16 +169,6 @@ public sealed class AgendamentoTests
     public void PeriodoAgendamento_QuandoFimNaoEPosteriorAoInicio_LancaExcecaoEspecifica()
     {
         Assert.Throws<FimAgendamentoInvalidoException>(() => new PeriodoAgendamento(AgoraUtc, AgoraUtc));
-    }
-
-    [Fact]
-    public void PeriodoAgendamento_QuandoFimNaoEstaEmUtc_LancaExcecaoEspecifica()
-    {
-        var fimLocal = DateTime.SpecifyKind(AgoraUtc.AddHours(1), DateTimeKind.Local);
-
-        var excecao = Assert.Throws<DataHoraAgendamentoNaoEstaEmUtcException>(() => new PeriodoAgendamento(AgoraUtc, fimLocal));
-
-        Assert.Contains("fimUtc", excecao.Message);
     }
 
     [Fact]

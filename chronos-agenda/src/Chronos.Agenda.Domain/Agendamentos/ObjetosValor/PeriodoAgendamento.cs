@@ -3,13 +3,12 @@ using Chronos.Agenda.Domain.Servicos.ObjetosValor;
 
 namespace Chronos.Agenda.Domain.Agendamentos.ObjetosValor;
 
-/// <summary>Representa o intervalo UTC ocupado por um agendamento.</summary>
+/// <summary>Representa o intervalo UTC ocupado por um agendamento. A camada de aplicação é responsável por
+/// garantir que os instantes recebidos já estejam em UTC antes de chegar ao domínio.</summary>
 public sealed record PeriodoAgendamento
 {
     public PeriodoAgendamento(DateTime inicioUtc, DateTime fimUtc)
     {
-        ExigirUtc(inicioUtc, nameof(inicioUtc));
-        ExigirUtc(fimUtc, nameof(fimUtc));
         ExigirFimPosteriorAoInicio(inicioUtc, fimUtc);
         InicioUtc = inicioUtc;
         FimUtc = fimUtc;
@@ -34,14 +33,6 @@ public sealed record PeriodoAgendamento
     {
         ArgumentNullException.ThrowIfNull(outro);
         return InicioUtc < outro.FimUtc && outro.InicioUtc < FimUtc;
-    }
-
-    private static void ExigirUtc(DateTime dataHora, string nomeParametro)
-    {
-        if (dataHora.Kind != DateTimeKind.Utc)
-        {
-            throw new DataHoraAgendamentoNaoEstaEmUtcException(nomeParametro, dataHora.Kind);
-        }
     }
 
     private static void ExigirFimPosteriorAoInicio(DateTime inicioUtc, DateTime fimUtc)

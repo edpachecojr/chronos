@@ -1,3 +1,4 @@
+using Chronos.Agenda.Domain.Agendamentos.Erros;
 using Chronos.Agenda.Domain.Agendamentos.EventosDominio;
 using Chronos.Agenda.Domain.Agendamentos.Exceptions;
 using Chronos.Agenda.Domain.Agendamentos.Enums;
@@ -5,6 +6,7 @@ using Chronos.Agenda.Domain.Agendamentos.ObjetosValor;
 using Chronos.Agenda.Domain.Compartilhado.Contratos;
 using Chronos.Agenda.Domain.Compartilhado.Entidades;
 using Chronos.Agenda.Domain.Compartilhado.ObjetosValor;
+using Chronos.Agenda.Domain.Compartilhado.Resultados;
 using Chronos.Agenda.Domain.Servicos.Enums;
 using Chronos.Agenda.Domain.Servicos.ObjetosValor;
 
@@ -63,10 +65,10 @@ public sealed class Agendamento : Entidade, IPertenceOrganizacao
             profissionalId,
             servicoId,
             nomeServicoContratado,
-            pessoaAtendida ?? throw new ArgumentNullException(nameof(pessoaAtendida)),
-            periodo ?? throw new ArgumentNullException(nameof(periodo)),
-            precoCobrado ?? throw new ArgumentNullException(nameof(precoCobrado)),
-            local ?? throw new ArgumentNullException(nameof(local)),
+            pessoaAtendida,
+            periodo,
+            precoCobrado,
+            local,
             auditoria,
             StatusAgendamento.Pendente);
         agendamento.LancarEventoDominio(new AgendamentoCriado(agendamento.Id, organizacaoId, profissionalId, servicoId, auditoria.CriadoEmUtc));
@@ -74,42 +76,53 @@ public sealed class Agendamento : Entidade, IPertenceOrganizacao
     }
 
     /// <summary>Altera os dados de um agendamento que ainda não foi cancelado.</summary>
-    /// <example><code>agendamento.Atualizar(pessoaAtendida, periodo, preco, local, provedorDataHora);</code></example>
-    public void Atualizar(
+    /// <example><code>var resultado = agendamento.Atualizar(pessoaAtendida, periodo, preco, local, provedorDataHora);</code></example>
+    public Resultado Atualizar(
         PessoaAtendida pessoaAtendida,
         PeriodoAgendamento periodo,
         PrecoServico precoCobrado,
         LocalAtendimento local,
         IProvedorDataHora provedorDataHora)
     {
-        ExigirNaoCancelado();
-        PessoaAtendida = pessoaAtendida ?? throw new ArgumentNullException(nameof(pessoaAtendida));
-        Periodo = periodo ?? throw new ArgumentNullException(nameof(periodo));
-        PrecoCobrado = precoCobrado ?? throw new ArgumentNullException(nameof(precoCobrado));
-        Local = local ?? throw new ArgumentNullException(nameof(local));
+        if (EstaCancelado())
+        {
+            return Resultado.Falha(AgendamentoErros.JaCancelado);
+        }
+
+        PessoaAtendida = pessoaAtendida;
+        Periodo = periodo;
+        PrecoCobrado = precoCobrado;
+        Local = local;
         Auditoria.Atualizar(provedorDataHora);
+        return Resultado.Ok();
     }
 
     /// <summary>Confirma um agendamento pendente.</summary>
-    /// <example><code>agendamento.Confirmar(provedorDataHora);</code></example>
-    public void Confirmar(IProvedorDataHora provedorDataHora)
+    /// <example><code>var resultado = agendamento.Confirmar(provedorDataHora);</code></example>
+    public Resultado Confirmar(IProvedorDataHora provedorDataHora)
     {
         if (Status != StatusAgendamento.Pendente)
         {
-            throw new ConfirmacaoAgendamentoInvalidaException(Status);
+            return Resultado.Falha(AgendamentoErros.ConfirmacaoInvalida(Status));
         }
 
         Status = StatusAgendamento.Confirmado;
         Auditoria.Atualizar(provedorDataHora);
+        return Resultado.Ok();
     }
 
     /// <summary>Cancela um agendamento que ainda está ativo.</summary>
-    /// <example><code>agendamento.Cancelar(provedorDataHora);</code></example>
-    public void Cancelar(IProvedorDataHora provedorDataHora)
+    /// <example><code>var resultado = agendamento.Cancelar(provedorDataHora);</code></example>
+    public Resultado Cancelar(IProvedorDataHora provedorDataHora)
     {
-        ExigirNaoCancelado();
+        if (EstaCancelado())
+        {
+            return Resultado.Falha(AgendamentoErros.JaCancelado);
+        }
+
         Status = StatusAgendamento.Cancelado;
         Auditoria.Atualizar(provedorDataHora);
+        return Resultado.Ok();
     }
 
     /// <summary>Informa se outro agendamento ocupa a agenda deste profissional no mesmo intervalo.</summary>
@@ -123,12 +136,9 @@ public sealed class Agendamento : Entidade, IPertenceOrganizacao
             && Periodo.Sobrepoe(outro.Periodo);
     }
 
-    private void ExigirNaoCancelado()
+    private bool EstaCancelado()
     {
-        if (Status == StatusAgendamento.Cancelado)
-        {
-            throw new AgendamentoCanceladoException();
-        }
+        return Status == StatusAgendamento.Cancelado;
     }
 
     private static void ValidarReferencias(Guid organizacaoId, Guid profissionalId, Guid servicoId)
