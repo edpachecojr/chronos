@@ -16,6 +16,8 @@ public sealed class Organizacao : Entidade
     }
 
     public NomeOrganizacao Nome { get; private set; }
+    public EnderecoAtendimento? EnderecoPrestador { get; private set; }
+    public FusoHorario? FusoHorario { get; private set; }
 
     /// <summary>Cria uma nova organização.</summary>
     /// <example><code>var organizacao = Organizacao.Criar(nome, provedorDataHora);</code></example>
@@ -30,6 +32,15 @@ public sealed class Organizacao : Entidade
     public void Renomear(NomeOrganizacao nome, IProvedorDataHora provedorDataHora)
     {
         Nome = nome;
+        Auditoria.Atualizar(provedorDataHora);
+    }
+
+    /// <summary>Configura o endereço do prestador e o fuso horário usados para interpretar o expediente da organização.</summary>
+    /// <example><code>organizacao.ConfigurarPerfilOperacional(endereco, fusoHorario, provedorDataHora);</code></example>
+    public void ConfigurarPerfilOperacional(EnderecoAtendimento? enderecoPrestador, FusoHorario fusoHorario, IProvedorDataHora provedorDataHora)
+    {
+        EnderecoPrestador = enderecoPrestador;
+        FusoHorario = fusoHorario ?? throw new ArgumentNullException(nameof(fusoHorario));
         Auditoria.Atualizar(provedorDataHora);
     }
 }
