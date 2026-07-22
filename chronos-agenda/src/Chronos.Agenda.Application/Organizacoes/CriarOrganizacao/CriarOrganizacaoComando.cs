@@ -1,4 +1,4 @@
-namespace Chronos.Agenda.Application.Organizacoes.CasosDeUso;
+namespace Chronos.Agenda.Application.Organizacoes.CriarOrganizacao;
 
 /// <summary>
 /// Dados para o onboarding de uma organização (UC01): cria a organização e

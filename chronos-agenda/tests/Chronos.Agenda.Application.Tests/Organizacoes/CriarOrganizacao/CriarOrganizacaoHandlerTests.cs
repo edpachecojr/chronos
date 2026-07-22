@@ -1,21 +1,21 @@
-using Chronos.Agenda.Application.Organizacoes.CasosDeUso;
+using Chronos.Agenda.Application.Organizacoes.CriarOrganizacao;
 using Chronos.Agenda.Application.Tests.Compartilhado.Fakes;
 using Chronos.Agenda.Application.Tests.Organizacoes.Fakes;
 using Chronos.Agenda.Application.Tests.Profissionais.Fakes;
 
-namespace Chronos.Agenda.Application.Tests.Organizacoes.CasosDeUso;
+namespace Chronos.Agenda.Application.Tests.Organizacoes.CriarOrganizacao;
 
-public class CriarOrganizacaoCasoDeUsoTests
+public class CriarOrganizacaoHandlerTests
 {
     private readonly FakeOrganizacaoRepositorio _organizacaoRepositorio = new();
     private readonly FakeProfissionalRepositorio _profissionalRepositorio = new();
     private readonly FakeMembroOrganizacaoRepositorio _membroOrganizacaoRepositorio = new();
     private readonly FakeUnidadeDeTrabalho _unidadeDeTrabalho = new();
-    private readonly CriarOrganizacaoCasoDeUso _casoDeUso;
+    private readonly CriarOrganizacaoHandler _handler;
 
-    public CriarOrganizacaoCasoDeUsoTests()
+    public CriarOrganizacaoHandlerTests()
     {
-        _casoDeUso = new CriarOrganizacaoCasoDeUso(
+        _handler = new CriarOrganizacaoHandler(
             _organizacaoRepositorio,
             _profissionalRepositorio,
             _membroOrganizacaoRepositorio,
@@ -29,7 +29,7 @@ public class CriarOrganizacaoCasoDeUsoTests
         var usuarioId = Guid.NewGuid();
         var comando = new CriarOrganizacaoComando(usuarioId, "Clínica Bem-Estar", "Dra. Ana Souza");
 
-        var resultado = await _casoDeUso.ExecutarAsync(comando, CancellationToken.None);
+        var resultado = await _handler.ExecutarAsync(comando, CancellationToken.None);
 
         Assert.True(resultado.Sucesso);
         var organizacaoPersistida = await _organizacaoRepositorio.BuscarPorIdAsync(resultado.Valor.OrganizacaoId, CancellationToken.None);
@@ -47,7 +47,7 @@ public class CriarOrganizacaoCasoDeUsoTests
     {
         var comando = new CriarOrganizacaoComando(Guid.NewGuid(), "", "Dra. Ana Souza");
 
-        var resultado = await _casoDeUso.ExecutarAsync(comando, CancellationToken.None);
+        var resultado = await _handler.ExecutarAsync(comando, CancellationToken.None);
 
         Assert.True(resultado.Falhou);
         Assert.Equal("Organizacao.NomeInvalido", resultado.Erro!.Codigo);
@@ -59,7 +59,7 @@ public class CriarOrganizacaoCasoDeUsoTests
     {
         var comando = new CriarOrganizacaoComando(Guid.NewGuid(), "Clínica Bem-Estar", "");
 
-        var resultado = await _casoDeUso.ExecutarAsync(comando, CancellationToken.None);
+        var resultado = await _handler.ExecutarAsync(comando, CancellationToken.None);
 
         Assert.True(resultado.Falhou);
         Assert.Equal("Profissional.NomeInvalido", resultado.Erro!.Codigo);

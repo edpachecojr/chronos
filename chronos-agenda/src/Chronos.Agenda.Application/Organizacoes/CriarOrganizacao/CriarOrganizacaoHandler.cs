@@ -12,7 +12,7 @@ using Chronos.Agenda.Domain.Organizacoes.Exceptions;
 using Chronos.Agenda.Domain.Organizacoes.ObjetosValor;
 using Chronos.Agenda.Domain.Profissionais.Entidades;
 
-namespace Chronos.Agenda.Application.Organizacoes.CasosDeUso;
+namespace Chronos.Agenda.Application.Organizacoes.CriarOrganizacao;
 
 /// <summary>
 /// Executa o onboarding de uma organização (UC01): cria a organização e seu
@@ -24,11 +24,11 @@ namespace Chronos.Agenda.Application.Organizacoes.CasosDeUso;
 /// docs/backlog/plano-implementacao-mvp.md, Fase 0).
 /// </summary>
 /// <example><code>
-/// var resultado = await casoDeUso.ExecutarAsync(
+/// var resultado = await handler.ExecutarAsync(
 ///     new CriarOrganizacaoComando(usuarioId, "Clínica Bem-Estar", "Dra. Ana Souza"),
 ///     cancellationToken);
 /// </code></example>
-public sealed class CriarOrganizacaoCasoDeUso(
+public sealed class CriarOrganizacaoHandler(
     IOrganizacaoRepositorio organizacaoRepositorio,
     IProfissionalRepositorio profissionalRepositorio,
     IMembroOrganizacaoRepositorio membroOrganizacaoRepositorio,
