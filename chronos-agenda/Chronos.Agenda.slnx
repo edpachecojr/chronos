@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Chronos.Agenda.Api/Chronos.Agenda.Api.csproj" />
+    <Project Path="src/Chronos.Agenda.Application/Chronos.Agenda.Application.csproj" />
+    <Project Path="src/Chronos.Agenda.Domain/Chronos.Agenda.Domain.csproj" />
+    <Project Path="src/Chronos.Agenda.Infrastructure/Chronos.Agenda.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Chronos.Agenda.Domain.Tests/Chronos.Agenda.Domain.Tests.csproj" />
+  </Folder>
+</Solution>

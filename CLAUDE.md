@@ -87,8 +87,13 @@ ser discutida e atualizada explicitamente, junto com os ADRs afetados.
 
 ## Estrutura
 
-- A estrutura de diretórios será definida em conjunto quando os projetos forem
-  criados.
+- Este repositório é um monorepo. Cada aplicação fica em uma pasta de primeiro
+  nível com seu próprio `src/`, `tests/` e arquivo de solução.
+- O backend `chronos-agenda` usa `src/Chronos.Agenda.Domain`,
+  `src/Chronos.Agenda.Application`, `src/Chronos.Agenda.Infrastructure` e
+  `src/Chronos.Agenda.Api`; seus testes ficam em `tests/`.
+- O domínio não depende das outras camadas. A aplicação depende do domínio; a
+  infraestrutura depende da aplicação; e a API depende da aplicação.
 - Siga as convenções dos frameworks escolhidos e mantenha caminhos previsíveis.
 - Prefira módulos pequenos e focados; não crie arquivos ou classes que concentrem
   responsabilidades distintas.

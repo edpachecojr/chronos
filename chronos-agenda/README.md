@@ -1,0 +1,28 @@
+# Chronos Agenda
+
+Solução .NET 10 do backend de agendamentos do Chronos.
+
+## Estrutura
+
+- `src/Chronos.Agenda.Domain`: regras e modelo de negócio sem dependências externas;
+- `src/Chronos.Agenda.Application`: fronteira dos casos de uso, ainda sem implementação;
+- `src/Chronos.Agenda.Infrastructure`: integrações técnicas, ainda sem implementação;
+- `src/Chronos.Agenda.Api`: host de endpoints, ainda sem endpoints;
+- `tests/Chronos.Agenda.Domain.Tests`: testes unitários do domínio.
+
+## Modelo inicial
+
+O domínio contém organizações, profissionais, disponibilidades semanais,
+serviços e agendamentos. O intervalo do agendamento é UTC e preserva a duração
+e o preço praticados no momento da reserva. `Agendamento.ConflitaCom` compara
+intervalos para o mesmo profissional; a garantia transacional contra corridas
+de concorrência continua pendente de ADR específico.
+
+A exclusão de agendamentos ainda não foi modelada como exclusão física ou
+lógica, pois a política de retenção é uma decisão futura do ADR 0001.
+
+## Testes
+
+```sh
+dotnet test Chronos.Agenda.slnx
+```

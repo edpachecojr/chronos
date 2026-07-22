@@ -49,8 +49,8 @@ parte da primeira entrega:
 - shadcn/ui;
 - Lucide React.
 
-O código do backend e do frontend ainda não foi iniciado. As decisões técnicas
-fundamentais estão registradas em
+O backend inicial está em [`chronos-agenda`](chronos-agenda), como uma solução
+.NET 10. As decisões técnicas fundamentais estão registradas em
 [`docs/adr/0001-decisoes-arquiteturais-iniciais.md`](docs/adr/0001-decisoes-arquiteturais-iniciais.md).
 
 ## Diretrizes de engenharia
