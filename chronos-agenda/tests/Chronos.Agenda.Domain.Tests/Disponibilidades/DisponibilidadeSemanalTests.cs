@@ -34,4 +34,63 @@ public sealed class DisponibilidadeSemanalTests
         Assert.Throws<JanelaHorarioInvalidaException>(
             () => new JanelaHorario(new TimeOnly(9, 0), new TimeOnly(9, 0)));
     }
+
+    [Fact]
+    public void ConflitaCom_QuandoMesmoProfissionalDiaEJanelaSobrepoem_RetornaVerdadeiro()
+    {
+        var profissionalId = Guid.NewGuid();
+        var primeira = CriarDisponibilidade(profissionalId, DayOfWeek.Monday, new TimeOnly(9, 0), new TimeOnly(12, 0));
+        var segunda = CriarDisponibilidade(profissionalId, DayOfWeek.Monday, new TimeOnly(11, 0), new TimeOnly(14, 0));
+
+        Assert.True(primeira.ConflitaCom(segunda));
+    }
+
+    [Fact]
+    public void ConflitaCom_QuandoJanelasApenasEncostam_RetornaFalso()
+    {
+        var profissionalId = Guid.NewGuid();
+        var primeira = CriarDisponibilidade(profissionalId, DayOfWeek.Monday, new TimeOnly(9, 0), new TimeOnly(12, 0));
+        var segunda = CriarDisponibilidade(profissionalId, DayOfWeek.Monday, new TimeOnly(12, 0), new TimeOnly(14, 0));
+
+        Assert.False(primeira.ConflitaCom(segunda));
+    }
+
+    [Fact]
+    public void ConflitaCom_QuandoDiasDiferentes_RetornaFalso()
+    {
+        var profissionalId = Guid.NewGuid();
+        var primeira = CriarDisponibilidade(profissionalId, DayOfWeek.Monday, new TimeOnly(9, 0), new TimeOnly(12, 0));
+        var segunda = CriarDisponibilidade(profissionalId, DayOfWeek.Tuesday, new TimeOnly(9, 0), new TimeOnly(12, 0));
+
+        Assert.False(primeira.ConflitaCom(segunda));
+    }
+
+    [Fact]
+    public void ConflitaCom_QuandoProfissionaisDiferentes_RetornaFalso()
+    {
+        var primeira = CriarDisponibilidade(Guid.NewGuid(), DayOfWeek.Monday, new TimeOnly(9, 0), new TimeOnly(12, 0));
+        var segunda = CriarDisponibilidade(Guid.NewGuid(), DayOfWeek.Monday, new TimeOnly(9, 0), new TimeOnly(12, 0));
+
+        Assert.False(primeira.ConflitaCom(segunda));
+    }
+
+    [Fact]
+    public void JanelaHorario_Sobrepoe_QuandoIntervalosSeCruzam_RetornaVerdadeiro()
+    {
+        var janela = new JanelaHorario(new TimeOnly(9, 0), new TimeOnly(12, 0));
+        var outra = new JanelaHorario(new TimeOnly(11, 0), new TimeOnly(14, 0));
+
+        Assert.True(janela.Sobrepoe(outra));
+    }
+
+    private static DisponibilidadeSemanal CriarDisponibilidade(Guid profissionalId, DayOfWeek diaDaSemana, TimeOnly inicio, TimeOnly fim)
+    {
+        var provedorDataHora = new FakeProvedorDataHora(new DateTime(2026, 7, 21, 12, 0, 0, DateTimeKind.Utc));
+        return DisponibilidadeSemanal.Criar(
+            Guid.NewGuid(),
+            profissionalId,
+            diaDaSemana,
+            new JanelaHorario(inicio, fim),
+            provedorDataHora);
+    }
 }

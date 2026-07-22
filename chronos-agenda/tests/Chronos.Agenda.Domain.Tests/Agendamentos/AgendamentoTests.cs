@@ -31,6 +31,35 @@ public sealed class AgendamentoTests
     }
 
     [Fact]
+    public void Criar_PreservaNomeDoServicoContratadoEDuracaoReservada()
+    {
+        var periodo = new PeriodoAgendamento(AgoraUtc, AgoraUtc.AddMinutes(45));
+
+        var agendamento = CriarAgendamento(Guid.NewGuid(), periodo, nomeServicoContratado: "Consulta inicial");
+
+        Assert.Equal("Consulta inicial", agendamento.NomeServicoContratado);
+        Assert.Equal(TimeSpan.FromMinutes(45), agendamento.DuracaoReservada);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Criar_QuandoNomeDoServicoContratadoAusente_LancaArgumentException(string? nomeServicoContratado)
+    {
+        Assert.ThrowsAny<ArgumentException>(() => Agendamento.Criar(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            nomeServicoContratado!,
+            new PessoaAtendida(new Nome("Ana Souza"), TipoPessoaAtendida.Cliente),
+            CriarPeriodo(AgoraUtc),
+            new PrecoServico(75m),
+            LocalAtendimento.Online(),
+            new FakeProvedorDataHora(AgoraUtc)));
+    }
+
+    [Fact]
     public void ConflitaCom_QuandoIntervalosDoMesmoProfissionalSobrepoem_RetornaVerdadeiro()
     {
         var profissionalId = Guid.NewGuid();
@@ -110,6 +139,15 @@ public sealed class AgendamentoTests
     }
 
     [Fact]
+    public void PeriodoAgendamento_APartirDaDuracao_CalculaFimAPartirDaDuracaoDoServico()
+    {
+        var periodo = PeriodoAgendamento.APartirDaDuracao(AgoraUtc, new DuracaoServico(TimeSpan.FromMinutes(30)));
+
+        Assert.Equal(AgoraUtc, periodo.InicioUtc);
+        Assert.Equal(AgoraUtc.AddMinutes(30), periodo.FimUtc);
+    }
+
+    [Fact]
     public void PeriodoAgendamento_QuandoFimNaoEPosteriorAoInicio_LancaExcecaoEspecifica()
     {
         Assert.Throws<FimAgendamentoInvalidoException>(() => new PeriodoAgendamento(AgoraUtc, AgoraUtc));
@@ -151,12 +189,14 @@ public sealed class AgendamentoTests
         Guid profissionalId,
         PeriodoAgendamento periodo,
         PessoaAtendida? pessoaAtendida = null,
-        LocalAtendimento? local = null)
+        LocalAtendimento? local = null,
+        string nomeServicoContratado = "Consulta")
     {
         return Agendamento.Criar(
             Guid.NewGuid(),
             profissionalId,
             Guid.NewGuid(),
+            nomeServicoContratado,
             pessoaAtendida ?? new PessoaAtendida(new Nome("Ana Souza"), TipoPessoaAtendida.Cliente),
             periodo,
             new PrecoServico(75m),

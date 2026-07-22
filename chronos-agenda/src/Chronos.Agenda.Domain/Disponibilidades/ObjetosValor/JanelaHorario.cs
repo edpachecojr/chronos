@@ -18,4 +18,12 @@ public sealed record JanelaHorario
 
     public TimeOnly Inicio { get; }
     public TimeOnly Fim { get; }
+
+    /// <summary>Informa se esta janela tem algum instante em comum com outra.</summary>
+    /// <example><code>var sobrepoe = janela.Sobrepoe(outraJanela);</code></example>
+    public bool Sobrepoe(JanelaHorario outra)
+    {
+        ArgumentNullException.ThrowIfNull(outra);
+        return Inicio < outra.Fim && outra.Inicio < Fim;
+    }
 }

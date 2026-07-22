@@ -50,6 +50,16 @@ public sealed class DisponibilidadeSemanal : Entidade, IPertenceOrganizacao
         Auditoria.Atualizar(provedorDataHora);
     }
 
+    /// <summary>Informa se outra disponibilidade ocupa uma janela sobreposta do mesmo profissional no mesmo dia.</summary>
+    /// <example><code>var conflita = disponibilidade.ConflitaCom(outraDisponibilidade);</code></example>
+    public bool ConflitaCom(DisponibilidadeSemanal outra)
+    {
+        ArgumentNullException.ThrowIfNull(outra);
+        return ProfissionalId == outra.ProfissionalId
+            && DiaDaSemana == outra.DiaDaSemana
+            && Janela.Sobrepoe(outra.Janela);
+    }
+
     private static void ValidarPropriedade(Guid organizacaoId, Guid profissionalId)
     {
         if (organizacaoId == Guid.Empty || profissionalId == Guid.Empty)

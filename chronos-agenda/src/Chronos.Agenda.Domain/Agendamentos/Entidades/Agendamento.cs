@@ -18,6 +18,7 @@ public sealed class Agendamento : Entidade, IPertenceOrganizacao
         Guid organizacaoId,
         Guid profissionalId,
         Guid servicoId,
+        string nomeServicoContratado,
         PessoaAtendida pessoaAtendida,
         PeriodoAgendamento periodo,
         PrecoServico precoCobrado,
@@ -29,6 +30,7 @@ public sealed class Agendamento : Entidade, IPertenceOrganizacao
         OrganizacaoId = organizacaoId;
         ProfissionalId = profissionalId;
         ServicoId = servicoId;
+        NomeServicoContratado = nomeServicoContratado;
         PessoaAtendida = pessoaAtendida;
         Periodo = periodo;
         PrecoCobrado = precoCobrado;
@@ -39,24 +41,28 @@ public sealed class Agendamento : Entidade, IPertenceOrganizacao
     public Guid OrganizacaoId { get; }
     public Guid ProfissionalId { get; }
     public Guid ServicoId { get; }
+    public string NomeServicoContratado { get; }
     public PessoaAtendida PessoaAtendida { get; private set; }
     public PeriodoAgendamento Periodo { get; private set; }
     public PrecoServico PrecoCobrado { get; private set; }
     public LocalAtendimento Local { get; private set; }
     public TipoAtendimento TipoAtendimento => Local.Tipo;
     public StatusAgendamento Status { get; private set; }
+    public TimeSpan DuracaoReservada => Periodo.Duracao;
 
-    /// <summary>Cria um novo agendamento pendente.</summary>
-    /// <example><code>var agendamento = Agendamento.Criar(organizacaoId, profissionalId, servicoId, pessoaAtendida, periodo, preco, local, provedorDataHora);</code></example>
-    public static Agendamento Criar(Guid organizacaoId, Guid profissionalId, Guid servicoId, PessoaAtendida pessoaAtendida, PeriodoAgendamento periodo, PrecoServico precoCobrado, LocalAtendimento local, IProvedorDataHora provedorDataHora)
+    /// <summary>Cria um novo agendamento pendente, preservando o nome do serviço vigente na contratação (RN05).</summary>
+    /// <example><code>var agendamento = Agendamento.Criar(organizacaoId, profissionalId, servicoId, servico.Nome.Valor, pessoaAtendida, periodo, preco, local, provedorDataHora);</code></example>
+    public static Agendamento Criar(Guid organizacaoId, Guid profissionalId, Guid servicoId, string nomeServicoContratado, PessoaAtendida pessoaAtendida, PeriodoAgendamento periodo, PrecoServico precoCobrado, LocalAtendimento local, IProvedorDataHora provedorDataHora)
     {
         ValidarReferencias(organizacaoId, profissionalId, servicoId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(nomeServicoContratado);
         var auditoria = Auditoria.Criar(provedorDataHora);
         var agendamento = new Agendamento(
             Guid.NewGuid(),
             organizacaoId,
             profissionalId,
             servicoId,
+            nomeServicoContratado,
             pessoaAtendida ?? throw new ArgumentNullException(nameof(pessoaAtendida)),
             periodo ?? throw new ArgumentNullException(nameof(periodo)),
             precoCobrado ?? throw new ArgumentNullException(nameof(precoCobrado)),
