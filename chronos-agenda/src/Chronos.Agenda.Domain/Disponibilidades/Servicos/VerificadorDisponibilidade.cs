@@ -1,42 +1,30 @@
-using Chronos.Agenda.Domain.Agendamentos.ObjetosValor;
+using Chronos.Agenda.Domain.Compartilhado.Resultados;
 using Chronos.Agenda.Domain.Disponibilidades.Entidades;
-using Chronos.Agenda.Domain.Disponibilidades.Exceptions;
-using Chronos.Agenda.Domain.Organizacoes.ObjetosValor;
+using Chronos.Agenda.Domain.Disponibilidades.Erros;
+using Chronos.Agenda.Domain.Disponibilidades.ObjetosValor;
 
 namespace Chronos.Agenda.Domain.Disponibilidades.Servicos;
 
-/// <summary>Verifica se um período de agendamento cabe na disponibilidade semanal do profissional (RN07).</summary>
+/// <summary>Verifica se um período ocupado cabe na disponibilidade semanal do profissional (RN07). Recebe o dia da
+/// semana e a janela já convertidos para o horário local da organização; a conversão UTC-local é responsabilidade
+/// da camada de aplicação.</summary>
 public static class VerificadorDisponibilidade
 {
-    /// <example><code>VerificadorDisponibilidade.Verificar(periodo, organizacao.FusoHorario, disponibilidadesDoProfissional);</code></example>
-    public static void Verificar(PeriodoAgendamento periodo, FusoHorario fusoHorario, IReadOnlyCollection<DisponibilidadeSemanal> disponibilidades)
+    /// <example><code>var resultado = VerificadorDisponibilidade.Verificar(diaDaSemanaLocal, janelaOcupadaLocal, disponibilidadesDoProfissional);</code></example>
+    public static Resultado Verificar(DayOfWeek diaDaSemana, JanelaHorario janelaOcupada, IReadOnlyCollection<DisponibilidadeSemanal> disponibilidades)
     {
-        ArgumentNullException.ThrowIfNull(periodo);
-        ArgumentNullException.ThrowIfNull(fusoHorario);
+        ArgumentNullException.ThrowIfNull(janelaOcupada);
         ArgumentNullException.ThrowIfNull(disponibilidades);
 
-        // Conversão UTC -> local nunca é ambígua ou inexistente (isso só ocorre no sentido
-        // local -> UTC, tratado na aplicação ao interpretar o horário informado pelo usuário).
-        var inicioLocal = fusoHorario.ConverterParaLocal(periodo.InicioUtc);
-        var fimLocal = fusoHorario.ConverterParaLocal(periodo.FimUtc);
-
-        if (!CabeEmAlgumaJanela(inicioLocal, fimLocal, disponibilidades))
-        {
-            throw new PeriodoForaDaDisponibilidadeException(periodo.InicioUtc, periodo.FimUtc);
-        }
+        return CabeEmAlgumaJanela(diaDaSemana, janelaOcupada, disponibilidades)
+            ? Resultado.Ok()
+            : Resultado.Falha(DisponibilidadeErros.ForaDaJanela(diaDaSemana, janelaOcupada));
     }
 
-    private static bool CabeEmAlgumaJanela(DateTime inicioLocal, DateTime fimLocal, IReadOnlyCollection<DisponibilidadeSemanal> disponibilidades)
+    private static bool CabeEmAlgumaJanela(DayOfWeek diaDaSemana, JanelaHorario janelaOcupada, IReadOnlyCollection<DisponibilidadeSemanal> disponibilidades)
     {
-        if (inicioLocal.Date != fimLocal.Date)
-        {
-            return false;
-        }
-
-        var inicioHorario = TimeOnly.FromDateTime(inicioLocal);
-        var fimHorario = TimeOnly.FromDateTime(fimLocal);
         return disponibilidades
-            .Where(disponibilidade => disponibilidade.DiaDaSemana == inicioLocal.DayOfWeek)
-            .Any(disponibilidade => disponibilidade.Janela.Inicio <= inicioHorario && fimHorario <= disponibilidade.Janela.Fim);
+            .Where(disponibilidade => disponibilidade.DiaDaSemana == diaDaSemana)
+            .Any(disponibilidade => disponibilidade.Janela.Inicio <= janelaOcupada.Inicio && janelaOcupada.Fim <= disponibilidade.Janela.Fim);
     }
 }

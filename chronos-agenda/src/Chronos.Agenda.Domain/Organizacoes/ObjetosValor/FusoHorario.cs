@@ -23,14 +23,6 @@ public sealed record FusoHorario
 
     public string Identificador { get; }
 
-    /// <summary>Converte um instante UTC para a hora local correspondente a este fuso horário.</summary>
-    /// <example><code>var horarioLocal = fusoHorario.ConverterParaLocal(instanteUtc);</code></example>
-    public DateTime ConverterParaLocal(DateTime instanteUtc)
-    {
-        var timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(Identificador);
-        return TimeZoneInfo.ConvertTimeFromUtc(instanteUtc, timeZoneInfo);
-    }
-
     private static bool ExisteFusoHorarioIana(string identificador)
     {
         try
