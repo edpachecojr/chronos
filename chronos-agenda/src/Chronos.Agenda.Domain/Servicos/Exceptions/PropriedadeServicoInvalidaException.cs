@@ -1,6 +1,6 @@
-using Chronos.Agenda.Domain.Compartilhado.Excecoes;
+using Chronos.Agenda.Domain.Compartilhado.Exceptions;
 
-namespace Chronos.Agenda.Domain.Servicos.Excecoes;
+namespace Chronos.Agenda.Domain.Servicos.Exceptions;
 
 /// <summary>Indica referências de organização ou profissional inválidas em um serviço.</summary>
 public sealed class PropriedadeServicoInvalidaException(Guid organizacaoId, Guid profissionalId)

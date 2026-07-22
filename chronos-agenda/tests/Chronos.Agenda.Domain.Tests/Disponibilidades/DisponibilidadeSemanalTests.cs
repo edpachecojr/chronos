@@ -1,5 +1,5 @@
 using Chronos.Agenda.Domain.Disponibilidades.Entidades;
-using Chronos.Agenda.Domain.Disponibilidades.Excecoes;
+using Chronos.Agenda.Domain.Disponibilidades.Exceptions;
 using Chronos.Agenda.Domain.Disponibilidades.ObjetosValor;
 
 namespace Chronos.Agenda.Domain.Tests.Disponibilidades;

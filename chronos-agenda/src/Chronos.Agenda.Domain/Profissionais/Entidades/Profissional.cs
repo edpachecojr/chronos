@@ -1,7 +1,7 @@
 using Chronos.Agenda.Domain.Compartilhado.Contratos;
 using Chronos.Agenda.Domain.Compartilhado.Entidades;
 using Chronos.Agenda.Domain.Profissionais.EventosDominio;
-using Chronos.Agenda.Domain.Profissionais.Excecoes;
+using Chronos.Agenda.Domain.Profissionais.Exceptions;
 using Chronos.Agenda.Domain.Profissionais.ObjetosValor;
 
 namespace Chronos.Agenda.Domain.Profissionais.Entidades;

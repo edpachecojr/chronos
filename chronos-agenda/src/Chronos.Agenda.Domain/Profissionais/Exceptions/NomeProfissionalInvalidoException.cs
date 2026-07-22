@@ -1,6 +1,6 @@
-using Chronos.Agenda.Domain.Compartilhado.Excecoes;
+using Chronos.Agenda.Domain.Compartilhado.Exceptions;
 
-namespace Chronos.Agenda.Domain.Profissionais.Excecoes;
+namespace Chronos.Agenda.Domain.Profissionais.Exceptions;
 
 /// <summary>Indica um nome de profissional ausente ou fora do limite permitido.</summary>
 public sealed class NomeProfissionalInvalidoException(int comprimento)

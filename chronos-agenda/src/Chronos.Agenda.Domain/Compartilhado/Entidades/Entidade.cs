@@ -1,5 +1,5 @@
 using Chronos.Agenda.Domain.Compartilhado.EventosDominio;
-using Chronos.Agenda.Domain.Compartilhado.Excecoes;
+using Chronos.Agenda.Domain.Compartilhado.Exceptions;
 
 namespace Chronos.Agenda.Domain.Compartilhado.Entidades;
 

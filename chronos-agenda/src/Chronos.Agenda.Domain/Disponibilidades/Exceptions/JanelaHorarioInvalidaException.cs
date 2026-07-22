@@ -1,6 +1,6 @@
-using Chronos.Agenda.Domain.Compartilhado.Excecoes;
+using Chronos.Agenda.Domain.Compartilhado.Exceptions;
 
-namespace Chronos.Agenda.Domain.Disponibilidades.Excecoes;
+namespace Chronos.Agenda.Domain.Disponibilidades.Exceptions;
 
 /// <summary>Indica uma janela de atendimento cujo fim não sucede o início.</summary>
 public sealed class JanelaHorarioInvalidaException(TimeOnly inicio, TimeOnly fim)

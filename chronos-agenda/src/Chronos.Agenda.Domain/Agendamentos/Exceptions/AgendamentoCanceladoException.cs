@@ -1,6 +1,6 @@
-using Chronos.Agenda.Domain.Compartilhado.Excecoes;
+using Chronos.Agenda.Domain.Compartilhado.Exceptions;
 
-namespace Chronos.Agenda.Domain.Agendamentos.Excecoes;
+namespace Chronos.Agenda.Domain.Agendamentos.Exceptions;
 
 /// <summary>Indica uma alteração tentada em um agendamento cancelado.</summary>
 public sealed class AgendamentoCanceladoException()

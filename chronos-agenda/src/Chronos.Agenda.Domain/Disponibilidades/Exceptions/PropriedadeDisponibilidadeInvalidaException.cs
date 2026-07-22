@@ -1,6 +1,6 @@
-using Chronos.Agenda.Domain.Compartilhado.Excecoes;
+using Chronos.Agenda.Domain.Compartilhado.Exceptions;
 
-namespace Chronos.Agenda.Domain.Disponibilidades.Excecoes;
+namespace Chronos.Agenda.Domain.Disponibilidades.Exceptions;
 
 /// <summary>Indica referências de organização ou profissional inválidas em uma disponibilidade.</summary>
 public sealed class PropriedadeDisponibilidadeInvalidaException(Guid organizacaoId, Guid profissionalId)

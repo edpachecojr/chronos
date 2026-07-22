@@ -1,6 +1,6 @@
-using Chronos.Agenda.Domain.Compartilhado.Excecoes;
+using Chronos.Agenda.Domain.Compartilhado.Exceptions;
 
-namespace Chronos.Agenda.Domain.Servicos.Excecoes;
+namespace Chronos.Agenda.Domain.Servicos.Exceptions;
 
 /// <summary>Indica um nome de serviço ausente ou fora do limite permitido.</summary>
 public sealed class NomeServicoInvalidoException(int comprimento)

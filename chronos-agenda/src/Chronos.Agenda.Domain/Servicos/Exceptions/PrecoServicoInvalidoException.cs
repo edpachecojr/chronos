@@ -1,6 +1,6 @@
-using Chronos.Agenda.Domain.Compartilhado.Excecoes;
+using Chronos.Agenda.Domain.Compartilhado.Exceptions;
 
-namespace Chronos.Agenda.Domain.Servicos.Excecoes;
+namespace Chronos.Agenda.Domain.Servicos.Exceptions;
 
 /// <summary>Indica um preço negativo ou com precisão monetária inválida.</summary>
 public sealed class PrecoServicoInvalidoException(decimal valor)

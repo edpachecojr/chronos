@@ -1,6 +1,6 @@
-using Chronos.Agenda.Domain.Compartilhado.Excecoes;
+using Chronos.Agenda.Domain.Compartilhado.Exceptions;
 
-namespace Chronos.Agenda.Domain.Organizacoes.Excecoes;
+namespace Chronos.Agenda.Domain.Organizacoes.Exceptions;
 
 /// <summary>Indica um nome de organização ausente ou fora do limite permitido.</summary>
 public sealed class NomeOrganizacaoInvalidoException(int comprimento)

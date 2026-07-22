@@ -1,6 +1,6 @@
-using Chronos.Agenda.Domain.Compartilhado.Excecoes;
+using Chronos.Agenda.Domain.Compartilhado.Exceptions;
 
-namespace Chronos.Agenda.Domain.Profissionais.Excecoes;
+namespace Chronos.Agenda.Domain.Profissionais.Exceptions;
 
 /// <summary>Indica que um profissional não foi associado a uma organização válida.</summary>
 public sealed class OrganizacaoProfissionalInvalidaException(Guid organizacaoId)

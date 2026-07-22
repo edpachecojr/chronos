@@ -1,6 +1,6 @@
-using Chronos.Agenda.Domain.Compartilhado.Excecoes;
+using Chronos.Agenda.Domain.Compartilhado.Exceptions;
 
-namespace Chronos.Agenda.Domain.Agendamentos.Excecoes;
+namespace Chronos.Agenda.Domain.Agendamentos.Exceptions;
 
 /// <summary>Indica que o início de um agendamento não foi informado em UTC.</summary>
 public sealed class InicioAgendamentoNaoEstaEmUtcException(DateTimeKind tipo)

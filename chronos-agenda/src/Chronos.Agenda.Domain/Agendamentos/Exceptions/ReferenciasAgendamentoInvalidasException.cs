@@ -1,6 +1,6 @@
-using Chronos.Agenda.Domain.Compartilhado.Excecoes;
+using Chronos.Agenda.Domain.Compartilhado.Exceptions;
 
-namespace Chronos.Agenda.Domain.Agendamentos.Excecoes;
+namespace Chronos.Agenda.Domain.Agendamentos.Exceptions;
 
 /// <summary>Indica referências obrigatórias ausentes ao criar um agendamento.</summary>
 public sealed class ReferenciasAgendamentoInvalidasException(Guid organizacaoId, Guid profissionalId, Guid servicoId)

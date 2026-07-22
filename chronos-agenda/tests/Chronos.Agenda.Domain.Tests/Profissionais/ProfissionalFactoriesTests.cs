@@ -1,6 +1,6 @@
 using Chronos.Agenda.Domain.Profissionais.Entidades;
 using Chronos.Agenda.Domain.Profissionais.EventosDominio;
-using Chronos.Agenda.Domain.Profissionais.Excecoes;
+using Chronos.Agenda.Domain.Profissionais.Exceptions;
 using Chronos.Agenda.Domain.Profissionais.ObjetosValor;
 
 namespace Chronos.Agenda.Domain.Tests.Profissionais;

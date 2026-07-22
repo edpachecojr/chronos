@@ -1,4 +1,4 @@
-using Chronos.Agenda.Domain.Profissionais.Excecoes;
+using Chronos.Agenda.Domain.Profissionais.Exceptions;
 
 namespace Chronos.Agenda.Domain.Profissionais.ObjetosValor;
 

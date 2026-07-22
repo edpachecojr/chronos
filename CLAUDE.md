@@ -98,9 +98,9 @@ ser discutida e atualizada explicitamente, junto com os ADRs afetados.
 - Prefira módulos pequenos e focados; não crie arquivos ou classes que concentrem
   responsabilidades distintas.
 - No domínio, cada feature é organizada por intenção: `Entidades`,
-  `ObjetosValor`, `Enumeracoes`, `EventosDominio` e `Excecoes`, conforme se
+  `ObjetosValor`, `Enums`, `EventosDominio` e `Exceptions`, conforme se
   aplicarem. `Compartilhado` segue a mesma regra com `Entidades`, `Contratos`,
-  `EventosDominio` e `Excecoes`.
+  `EventosDominio` e `Exceptions`.
 - Namespaces devem acompanhar essa estrutura de diretórios. Eventos dentro de
   `EventosDominio` não recebem o sufixo redundante `EventoDominio`; a interface
   compartilhada `IEventoDominio` preserva o nome que comunica seu papel.

@@ -1,4 +1,4 @@
-using Chronos.Agenda.Domain.Disponibilidades.Excecoes;
+using Chronos.Agenda.Domain.Disponibilidades.Exceptions;
 
 namespace Chronos.Agenda.Domain.Disponibilidades.ObjetosValor;
 

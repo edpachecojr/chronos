@@ -1,4 +1,4 @@
-using Chronos.Agenda.Domain.Organizacoes.Excecoes;
+using Chronos.Agenda.Domain.Organizacoes.Exceptions;
 using Chronos.Agenda.Domain.Organizacoes.ObjetosValor;
 
 namespace Chronos.Agenda.Domain.Tests.Organizacoes;

@@ -1,7 +1,7 @@
 using Chronos.Agenda.Domain.Compartilhado.Contratos;
 using Chronos.Agenda.Domain.Compartilhado.Entidades;
 using Chronos.Agenda.Domain.Disponibilidades.EventosDominio;
-using Chronos.Agenda.Domain.Disponibilidades.Excecoes;
+using Chronos.Agenda.Domain.Disponibilidades.Exceptions;
 using Chronos.Agenda.Domain.Disponibilidades.ObjetosValor;
 
 namespace Chronos.Agenda.Domain.Disponibilidades.Entidades;

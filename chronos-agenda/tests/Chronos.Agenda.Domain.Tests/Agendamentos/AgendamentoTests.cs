@@ -1,8 +1,8 @@
 using Chronos.Agenda.Domain.Agendamentos.Entidades;
-using Chronos.Agenda.Domain.Agendamentos.Enumeracoes;
-using Chronos.Agenda.Domain.Agendamentos.Excecoes;
+using Chronos.Agenda.Domain.Agendamentos.Enums;
+using Chronos.Agenda.Domain.Agendamentos.Exceptions;
 using Chronos.Agenda.Domain.Agendamentos.ObjetosValor;
-using Chronos.Agenda.Domain.Servicos.Enumeracoes;
+using Chronos.Agenda.Domain.Servicos.Enums;
 using Chronos.Agenda.Domain.Servicos.ObjetosValor;
 
 namespace Chronos.Agenda.Domain.Tests.Agendamentos;

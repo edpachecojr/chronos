@@ -13,9 +13,9 @@ expressa pela pasta e pelo namespace `EventosDominio`.
 ## Decisão
 
 Cada feature do domínio será organizada em subpastas por intenção, usando
-`Entidades`, `ObjetosValor`, `Enumeracoes`, `EventosDominio` e `Excecoes` quando
+`Entidades`, `ObjetosValor`, `Enums`, `EventosDominio` e `Exceptions` quando
 aplicáveis. O módulo `Compartilhado` usa a mesma organização para suas
-intenções transversais: `Entidades`, `Contratos`, `EventosDominio` e `Excecoes`.
+intenções transversais: `Entidades`, `Contratos`, `EventosDominio` e `Exceptions`.
 Os namespaces acompanham os diretórios.
 
 Os tipos de evento não terão o sufixo `EventoDominio`, pois o namespace já
