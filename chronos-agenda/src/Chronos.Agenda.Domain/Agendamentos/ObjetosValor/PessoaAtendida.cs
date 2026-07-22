@@ -1,23 +1,17 @@
 using Chronos.Agenda.Domain.Agendamentos.Enums;
-using Chronos.Agenda.Domain.Agendamentos.Exceptions;
+using Chronos.Agenda.Domain.Compartilhado.ObjetosValor;
 
 namespace Chronos.Agenda.Domain.Agendamentos.ObjetosValor;
 
 /// <summary>Identifica a pessoa que receberá o serviço em um agendamento.</summary>
 public sealed record PessoaAtendida
 {
-    public PessoaAtendida(string nome, TipoPessoaAtendida tipo)
+    public PessoaAtendida(Nome nome, TipoPessoaAtendida tipo)
     {
-        var nomeNormalizado = nome?.Trim();
-        if (string.IsNullOrWhiteSpace(nomeNormalizado) || nomeNormalizado.Length > 120)
-        {
-            throw new NomePessoaAtendidaInvalidoException(nomeNormalizado?.Length ?? 0);
-        }
-
-        Nome = nomeNormalizado;
+        Nome = nome ?? throw new ArgumentNullException(nameof(nome));
         Tipo = tipo;
     }
 
-    public string Nome { get; }
+    public Nome Nome { get; }
     public TipoPessoaAtendida Tipo { get; }
 }

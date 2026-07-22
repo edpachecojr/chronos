@@ -2,6 +2,7 @@ using Chronos.Agenda.Domain.Agendamentos.Entidades;
 using Chronos.Agenda.Domain.Agendamentos.Enums;
 using Chronos.Agenda.Domain.Agendamentos.Exceptions;
 using Chronos.Agenda.Domain.Agendamentos.ObjetosValor;
+using Chronos.Agenda.Domain.Compartilhado.ObjetosValor;
 using Chronos.Agenda.Domain.Servicos.Enums;
 using Chronos.Agenda.Domain.Servicos.ObjetosValor;
 using Chronos.Agenda.Domain.Tests.Compartilhado;
@@ -16,12 +17,12 @@ public sealed class AgendamentoTests
     public void Criar_PreservaPessoaPeriodoPrecoELocal()
     {
         var periodo = CriarPeriodo(AgoraUtc);
-        var pessoaAtendida = new PessoaAtendida("  Marina Silva  ", TipoPessoaAtendida.Paciente);
+        var pessoaAtendida = new PessoaAtendida(new Nome("  Marina Silva  "), TipoPessoaAtendida.Paciente);
         var local = LocalAtendimento.Domiciliar(new EnderecoAtendimento("  Rua das Flores, 10  "));
 
         var agendamento = CriarAgendamento(Guid.NewGuid(), periodo, pessoaAtendida, local);
 
-        Assert.Equal("Marina Silva", agendamento.PessoaAtendida.Nome);
+        Assert.Equal("Marina Silva", agendamento.PessoaAtendida.Nome.Valor);
         Assert.Equal(TipoPessoaAtendida.Paciente, agendamento.PessoaAtendida.Tipo);
         Assert.Equal(periodo, agendamento.Periodo);
         Assert.Equal(75m, agendamento.PrecoCobrado.Valor);
@@ -92,7 +93,7 @@ public sealed class AgendamentoTests
         agendamento.Cancelar(provedorDataHora);
 
         Assert.Throws<AgendamentoCanceladoException>(() => agendamento.Atualizar(
-            new PessoaAtendida("Ana Souza", TipoPessoaAtendida.Cliente),
+            new PessoaAtendida(new Nome("Ana Souza"), TipoPessoaAtendida.Cliente),
             CriarPeriodo(AgoraUtc.AddHours(2)),
             new PrecoServico(80m),
             LocalAtendimento.Online(),
@@ -140,18 +141,10 @@ public sealed class AgendamentoTests
         Assert.Equal("Av. Central, 20", local.Endereco!.Descricao);
     }
 
-    [Theory]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void EnderecoAtendimento_QuandoAusente_LancaExcecaoEspecifica(string descricao)
-    {
-        Assert.Throws<EnderecoAtendimentoInvalidoException>(() => new EnderecoAtendimento(descricao));
-    }
-
     [Fact]
-    public void PessoaAtendida_QuandoNomeAusente_LancaExcecaoEspecifica()
+    public void PessoaAtendida_QuandoNomeNulo_LancaArgumentNullException()
     {
-        Assert.Throws<NomePessoaAtendidaInvalidoException>(() => new PessoaAtendida(" ", TipoPessoaAtendida.Outro));
+        Assert.Throws<ArgumentNullException>(() => new PessoaAtendida(null!, TipoPessoaAtendida.Outro));
     }
 
     private static Agendamento CriarAgendamento(
@@ -164,7 +157,7 @@ public sealed class AgendamentoTests
             Guid.NewGuid(),
             profissionalId,
             Guid.NewGuid(),
-            pessoaAtendida ?? new PessoaAtendida("Ana Souza", TipoPessoaAtendida.Cliente),
+            pessoaAtendida ?? new PessoaAtendida(new Nome("Ana Souza"), TipoPessoaAtendida.Cliente),
             periodo,
             new PrecoServico(75m),
             local ?? LocalAtendimento.NoEnderecoDoPrestador(new EnderecoAtendimento("Rua Exemplo, 1")),

@@ -3,7 +3,6 @@ using Chronos.Agenda.Domain.Compartilhado.Entidades;
 using Chronos.Agenda.Domain.Compartilhado.ObjetosValor;
 using Chronos.Agenda.Domain.Profissionais.EventosDominio;
 using Chronos.Agenda.Domain.Profissionais.Exceptions;
-using Chronos.Agenda.Domain.Profissionais.ObjetosValor;
 
 namespace Chronos.Agenda.Domain.Profissionais.Entidades;
 
@@ -13,7 +12,7 @@ public sealed class Profissional : Entidade, IPertenceOrganizacao
     private Profissional(
         Guid id,
         Guid organizacaoId,
-        NomeProfissional nome,
+        Nome nome,
         Auditoria auditoria)
         : base(id, auditoria)
     {
@@ -22,11 +21,11 @@ public sealed class Profissional : Entidade, IPertenceOrganizacao
     }
 
     public Guid OrganizacaoId { get; }
-    public NomeProfissional Nome { get; private set; }
+    public Nome Nome { get; private set; }
 
     /// <summary>Cria um novo profissional vinculado a uma organização.</summary>
     /// <example><code>var profissional = Profissional.Criar(organizacaoId, nome, provedorDataHora);</code></example>
-    public static Profissional Criar(Guid organizacaoId, NomeProfissional nome, IProvedorDataHora provedorDataHora)
+    public static Profissional Criar(Guid organizacaoId, Nome nome, IProvedorDataHora provedorDataHora)
     {
         ValidarOrganizacao(organizacaoId);
         var auditoria = Auditoria.Criar(provedorDataHora);
@@ -35,7 +34,7 @@ public sealed class Profissional : Entidade, IPertenceOrganizacao
         return profissional;
     }
 
-    public void Renomear(NomeProfissional nome, IProvedorDataHora provedorDataHora)
+    public void Renomear(Nome nome, IProvedorDataHora provedorDataHora)
     {
         Nome = nome;
         Auditoria.Atualizar(provedorDataHora);
