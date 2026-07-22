@@ -29,11 +29,12 @@ internal sealed class FakeAgendamentoRepositorio : IAgendamentoRepositorio
     }
 
     public Task<IReadOnlyCollection<Agendamento>> BuscarAtivosSobrepostosAsync(
-        Guid organizacaoId, Guid profissionalId, PeriodoAgendamento periodo, CancellationToken cancellationToken)
+        Guid organizacaoId, Guid profissionalId, PeriodoAgendamento periodo, Guid? excluirAgendamentoId, CancellationToken cancellationToken)
     {
         var encontrados = Filtrar(organizacaoId)
             .Where(a => a.ProfissionalId == profissionalId
                 && a.Status != StatusAgendamento.Cancelado
+                && a.Id != excluirAgendamentoId
                 && a.Periodo.Sobrepoe(periodo))
             .ToList();
         return Task.FromResult<IReadOnlyCollection<Agendamento>>(encontrados);

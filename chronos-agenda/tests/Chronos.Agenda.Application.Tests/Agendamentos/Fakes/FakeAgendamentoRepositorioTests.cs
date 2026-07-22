@@ -28,9 +28,24 @@ public class FakeAgendamentoRepositorioTests
         await _repositorio.AdicionarAsync(cancelado, CancellationToken.None);
         await _repositorio.AdicionarAsync(deOutraOrganizacao, CancellationToken.None);
 
-        var encontrados = await _repositorio.BuscarAtivosSobrepostosAsync(organizacaoId, profissionalId, periodoNovo, CancellationToken.None);
+        var encontrados = await _repositorio.BuscarAtivosSobrepostosAsync(organizacaoId, profissionalId, periodoNovo, null, CancellationToken.None);
 
         Assert.Equal([ativoSobreposto], encontrados);
+    }
+
+    [Fact]
+    public async Task BuscarAtivosSobrepostos_exclui_o_agendamento_informado()
+    {
+        var organizacaoId = Guid.NewGuid();
+        var profissionalId = Guid.NewGuid();
+        var periodoNovo = new PeriodoAgendamento(InicioBase, InicioBase.AddMinutes(30));
+        var proprioAgendamento = CriarAgendamento(organizacaoId, profissionalId, InicioBase.AddMinutes(-15));
+        await _repositorio.AdicionarAsync(proprioAgendamento, CancellationToken.None);
+
+        var encontrados = await _repositorio.BuscarAtivosSobrepostosAsync(
+            organizacaoId, profissionalId, periodoNovo, proprioAgendamento.Id, CancellationToken.None);
+
+        Assert.Empty(encontrados);
     }
 
     [Fact]

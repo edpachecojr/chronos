@@ -1,3 +1,4 @@
+using Chronos.Agenda.Application.Agendamentos;
 using Chronos.Agenda.Domain.Agendamentos.Enums;
 
 namespace Chronos.Agenda.Application.Agendamentos.CriarAgendamento;
@@ -18,4 +19,4 @@ public sealed record CriarAgendamentoComando(
     string NomePessoaAtendida,
     TipoPessoaAtendida TipoPessoaAtendida,
     DateTimeOffset Inicio,
-    string? EnderecoPessoaAtendida);
+    string? EnderecoPessoaAtendida) : IDadosAgendamento;

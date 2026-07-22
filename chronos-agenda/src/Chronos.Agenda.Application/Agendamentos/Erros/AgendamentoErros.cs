@@ -37,4 +37,16 @@ public static class AgendamentoErros
     public static Erro ConflitoDeAgenda(Guid profissionalId) => new(
         "Agendamento.ConflitoDeAgenda",
         $"O período informado se sobrepõe a outro agendamento ativo do profissional {profissionalId}.");
+
+    /// <summary>O agendamento não existe ou pertence a outra organização (RN01).</summary>
+    public static Erro NaoEncontrado(Guid organizacaoId, Guid agendamentoId) => new(
+        "Agendamento.NaoEncontrado",
+        $"Nenhum agendamento {agendamentoId} foi encontrado na organização {organizacaoId}.");
+
+    /// <summary>Reagendar não pode trocar o profissional ou o serviço de um agendamento existente, pois
+    /// <c>Agendamento.ProfissionalId</c>/<c>ServicoId</c> são imutáveis após a criação; cancele e crie um novo
+    /// agendamento para isso.</summary>
+    public static readonly Erro AlteracaoDeProfissionalOuServicoNaoPermitida = new(
+        "Agendamento.AlteracaoDeProfissionalOuServicoNaoPermitida",
+        "Não é possível alterar o profissional ou o serviço de um agendamento existente ao reagendar.");
 }

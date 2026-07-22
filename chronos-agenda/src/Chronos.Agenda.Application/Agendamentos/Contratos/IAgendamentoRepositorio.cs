@@ -17,9 +17,11 @@ public interface IAgendamentoRepositorio
     Task<Agendamento?> BuscarPorIdAsync(Guid organizacaoId, Guid agendamentoId, CancellationToken cancellationToken);
 
     /// <summary>Busca agendamentos ativos do profissional, dentro do limite da organização informada (RN01), que se
-    /// sobrepõem ao período informado, para impedir conflito de agenda (RN02).</summary>
+    /// sobrepõem ao período informado, para impedir conflito de agenda (RN02).
+    /// <paramref name="excluirAgendamentoId"/> remove o próprio agendamento da busca ao reagendar (UC05); passe
+    /// <c>null</c> ao criar um agendamento novo (UC04).</summary>
     Task<IReadOnlyCollection<Agendamento>> BuscarAtivosSobrepostosAsync(
-        Guid organizacaoId, Guid profissionalId, PeriodoAgendamento periodo, CancellationToken cancellationToken);
+        Guid organizacaoId, Guid profissionalId, PeriodoAgendamento periodo, Guid? excluirAgendamentoId, CancellationToken cancellationToken);
 
     /// <summary>Busca agendamentos do profissional, dentro do limite da organização informada (RN01), num período,
     /// para projeção de agenda (UC07).</summary>

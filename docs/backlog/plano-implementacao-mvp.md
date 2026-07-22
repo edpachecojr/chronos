@@ -5,10 +5,14 @@
   de disponibilidade e RN07; Fase 0 da aplicação concluída: Result Pattern
   reaproveitado do domínio, portas de repositório, unidade de trabalho e
   resolução do tenant corrente — `IMembroOrganizacaoRepositorio` e
-  `ContextoUsuario`; UC01 a UC04 implementados em Application — onboard de
-  organização, configurar disponibilidade, gerir serviço e criar agendamento;
+  `ContextoUsuario`; UC01 a UC07 implementados em Application — onboard de
+  organização, configurar disponibilidade, gerir serviço, criar e reagendar
+  agendamento, confirmar/cancelar e consultar agenda diária/semanal;
   `FusoHorario.ConverterParaLocal` adicionado ao domínio; ADR 0005 resolve,
-  para este escopo, a parte do ADR pendente #4 sobre horário ambíguo/inexistente)
+  para este escopo, a parte do ADR pendente #4 sobre horário ambíguo/inexistente;
+  UC04 e UC05 compartilham preparação/validação via `AgendamentoPreparador`, e
+  UC07 compartilha resolução de fuso e projeção diária via `ProjetorDeAgenda`,
+  ambos internos à feature `Agendamentos`)
 - Escopo: Chronos Agenda
 - Base: `docs/backlog/dominio.md`, ADR 0001, ADR 0002, ADR 0003 e ADR 0005
 
@@ -337,42 +341,84 @@ Antes de qualquer caso de uso:
   (domínio), `Agendamento.ConflitoDeAgenda` (novo catálogo
   `Application.Agendamentos.Erros.AgendamentoErros`).
 
-### UC05 — Reagendar/editar
+### UC05 — Reagendar/editar — concluída
 
-- Comando: `ReagendarAgendamentoComando { AgendamentoId, ... mesmos campos de
-  UC04 }`.
-- Mesma validação de UC04 (passos 1–6), excluindo o próprio agendamento da
-  busca de conflito (passo 6). A transição de cancelado é rejeitada pelo
-  próprio domínio (`AgendamentoCanceladoException`), tratada como erro
-  esperado na aplicação.
-- Chama `Agendamento.Atualizar(...)` ao final; mantém a trilha de auditoria
-  já existente (`Auditoria.Atualizar`).
+- Comando: `ReagendarAgendamentoComando { AgendamentoId, ProfissionalId,
+  ServicoId, NomePessoaAtendida, TipoPessoaAtendida, Inicio,
+  EnderecoPessoaAtendida }` — mesmos campos de UC04, em
+  `Application.Agendamentos.ReagendarAgendamento`.
+- A preparação (referências, RN04, pessoa atendida, período RN05, local RN06)
+  e a validação (disponibilidade RN07, conflito RN02) foram extraídas de
+  `CriarAgendamentoHandler` para `Agendamentos.AgendamentoPreparador`
+  (`PrepararAsync`/`ValidarRegrasAsync`), reaproveitado por criar e reagendar
+  — a mesma orquestração que a seção 4 já antecipava.
+  `IAgendamentoRepositorio.BuscarAtivosSobrepostosAsync` ganhou o parâmetro
+  `excluirAgendamentoId` para excluir o próprio agendamento da busca de
+  conflito ao reagendar (`null` ao criar).
+- `ReagendarAgendamentoHandler` busca o agendamento pela organização corrente
+  (RN01) e rejeita, com um novo erro
+  (`Agendamento.AlteracaoDeProfissionalOuServicoNaoPermitida`), qualquer
+  tentativa de informar um `ProfissionalId`/`ServicoId` diferente do já
+  vinculado — ambos são imutáveis em `Agendamento` após a criação, então o
+  comando não poderia de fato aplicá-los. Chama `Agendamento.Atualizar(...)`
+  ao final, que já retorna `Resultado` de domínio (`Agendamento.JaCancelado`
+  quando o agendamento já foi cancelado) — a aplicação apenas repassa esse
+  resultado, sem precisar capturar exceção.
+- Portas: as mesmas de UC04, mais `IAgendamentoRepositorio.AtualizarAsync`.
+- Erros esperados: os mesmos de UC04, mais `Agendamento.NaoEncontrado`,
+  `Agendamento.AlteracaoDeProfissionalOuServicoNaoPermitida` e
+  `Agendamento.JaCancelado` (domínio, repassado como está).
 
-### UC06 — Confirmar/cancelar
+### UC06 — Confirmar/cancelar — concluída
 
-- Comandos: `ConfirmarAgendamentoComando`, `CancelarAgendamentoComando`.
+- Comandos: `ConfirmarAgendamentoComando`, `CancelarAgendamentoComando`, cada
+  um em sua própria pasta de caso de uso
+  (`Application.Agendamentos.ConfirmarAgendamento`/`CancelarAgendamento`).
 - Passos: buscar o agendamento filtrando pela organização corrente (RN01) →
-  chamar `Confirmar`/`Cancelar` → persistir.
-- As exceções de domínio existentes
-  (`ConfirmacaoAgendamentoInvalidaException`, `AgendamentoCanceladoException`)
-  representam transições inválidas que são um fluxo esperado do usuário —
-  devem ser capturadas no caso de uso e convertidas em Result, não deixadas
-  subir como exceção não tratada.
-- Portas: `IAgendamentoRepositorio.BuscarPorId`.
+  chamar `Confirmar`/`Cancelar` → persistir numa única
+  `IUnidadeDeTrabalho.SalvarAlteracoesAsync`.
+- `Agendamento.Confirmar`/`Cancelar` já retornam `Resultado` de domínio
+  (`Agendamento.ConfirmacaoInvalida`, `Agendamento.JaCancelado`) em vez de
+  lançar exceção — diferente do que a seção original deste documento previa
+  (`ConfirmacaoAgendamentoInvalidaException`/`AgendamentoCanceladoException`),
+  o domínio já foi implementado com o Result Pattern nessas transições; a
+  aplicação apenas repassa o `Resultado` recebido, sem capturar exceção.
+- Portas: `IAgendamentoRepositorio.BuscarPorIdAsync`/`AtualizarAsync`.
+- Erros esperados: `Agendamento.NaoEncontrado` (novo, aplicação),
+  `Agendamento.ConfirmacaoInvalida`/`Agendamento.JaCancelado` (domínio).
 
-### UC07 — Consultar agenda
+### UC07 — Consultar agenda — concluída
 
-- Consultas: `ConsultarAgendaDiariaConsulta`, `ConsultarAgendaSemanalConsulta`.
-- Passos: buscar disponibilidades do profissional no(s) dia(s) → buscar
-  agendamentos pendentes/confirmados no intervalo → projetar um DTO de
-  ocupação/espaço livre, convertendo para o fuso da organização apenas na
-  apresentação (o armazenamento permanece em UTC).
-- Cancelados não ocupam capacidade, mas continuam disponíveis para consulta
-  de histórico conforme a política de retenção do **[ADR pendente #3]**
-  (Marco 3 — não bloqueia o MVP).
-- Portas: `IAgendamentoRepositorio.BuscarPorProfissionalEPeriodo`,
-  `IDisponibilidadeSemanalRepositorio.BuscarPorProfissional`.
-- Sem exceções de domínio esperadas; é leitura pura.
+- Consultas: `ConsultarAgendaDiariaConsulta { ProfissionalId, Data }`,
+  `ConsultarAgendaSemanalConsulta { ProfissionalId, InicioDaSemana }`, cada
+  uma em sua própria pasta de caso de uso
+  (`Application.Agendamentos.ConsultarAgendaDiaria`/`ConsultarAgendaSemanal`).
+- A resolução do fuso horário da organização corrente (RN01) e a projeção de
+  um dia (janelas de disponibilidade do dia da semana + períodos ocupados por
+  agendamentos ativos) foram extraídas para `Agendamentos.ProjetorDeAgenda`,
+  reaproveitado pelas duas consultas; a consulta semanal chama a projeção
+  diária sete vezes a partir de `InicioDaSemana`.
+- A conversão de data local para intervalo UTC de busca **não** usa
+  local→UTC (ambíguo, ADR pendente #4): a projeção busca um intervalo UTC
+  alargado em um dia para cada lado do dia local pedido — cobrindo qualquer
+  offset possível — e filtra a data local exata de cada agendamento
+  retornado convertendo UTC→local (`FusoHorario.ConverterParaLocal`, nunca
+  ambíguo), a mesma direção de conversão já usada por RN07 e pelo ADR 0005.
+- Cancelados não ocupam capacidade (são excluídos da projeção), mas a
+  consulta de histórico com cancelados fica para a política de retenção do
+  **[ADR pendente #3]** (Marco 3 — não bloqueia o MVP).
+- Resultado: `AgendaDiariaResultado { Data, DiaDaSemana, JanelasDisponiveis,
+  PeriodosOcupados }` (com `PeriodoOcupado { AgendamentoId, Inicio, Fim,
+  Status }`, tudo já no fuso local); `AgendaSemanalResultado { Dias }` agrega
+  um `AgendaDiariaResultado` por dia.
+- Portas: `IAgendamentoRepositorio.BuscarPorProfissionalEPeriodoAsync`,
+  `IDisponibilidadeSemanalRepositorio.BuscarPorProfissionalEDiaAsync`,
+  `IOrganizacaoRepositorio.BuscarPorIdAsync`,
+  `IProfissionalRepositorio.BuscarPorIdAsync`.
+- Sem exceções de domínio esperadas; é leitura pura. Erros esperados apenas
+  de referência: `Profissional.NaoEncontrado`, `Organizacao.NaoEncontrada`,
+  `Agendamento.PerfilOperacionalNaoConfigurado` (reaproveitado de UC04, já
+  que a projeção também depende do fuso horário da organização).
 
 ## 4. Sequenciamento recomendado
 
@@ -391,10 +437,15 @@ Antes de qualquer caso de uso:
    local→UTC do horário informado pelo usuário): o contrato de entrada passou
    a exigir offset explícito (`DateTimeOffset`), eliminando o cenário de
    horário ambíguo/inexistente nessa direção. UC05 (reagendar) reaproveita a
-   mesma infraestrutura de UC04 (`ResolverReferenciasAsync`, `PrepararAsync`,
-   `ValidarRegrasAsync`) e não tem mais nenhuma dependência de ADR restante.
-6. Aplicação UC06 (mais simples, sem novas dependências de domínio).
-7. Aplicação UC07 (somente leitura).
+   mesma infraestrutura de UC04, extraída para `AgendamentoPreparador`
+   (`PrepararAsync`, `ValidarRegrasAsync`), e não tem mais nenhuma
+   dependência de ADR restante.
+6. ✅ Aplicação UC06 concluída (mais simples, sem novas dependências de
+   domínio; `Confirmar`/`Cancelar` já retornam `Resultado`, sem exceção a
+   capturar).
+7. ✅ Aplicação UC07 concluída (somente leitura; resolução de fuso e
+   projeção diária extraídas para `ProjetorDeAgenda`, reaproveitado pelas
+   consultas diária e semanal).
 8. Persistência EF Core/PostgreSQL e garantia transacional contra
    sobreposição (**[ADR pendente #1]**) — Marco 2, item 4 de `dominio.md`.
 
