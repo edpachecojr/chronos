@@ -18,10 +18,10 @@ public sealed class Agendamento : Entidade, IPertenceOrganizacao
         Guid organizacaoId,
         Guid profissionalId,
         Guid servicoId,
-        NomeCliente cliente,
+        PessoaAtendida pessoaAtendida,
         PeriodoAgendamento periodo,
         PrecoServico precoCobrado,
-        TipoAtendimento tipoAtendimento,
+        LocalAtendimento local,
         Auditoria auditoria,
         StatusAgendamento status)
         : base(id, auditoria)
@@ -29,47 +29,58 @@ public sealed class Agendamento : Entidade, IPertenceOrganizacao
         OrganizacaoId = organizacaoId;
         ProfissionalId = profissionalId;
         ServicoId = servicoId;
-        Cliente = cliente;
+        PessoaAtendida = pessoaAtendida;
         Periodo = periodo;
         PrecoCobrado = precoCobrado;
-        TipoAtendimento = tipoAtendimento;
+        Local = local;
         Status = status;
     }
 
     public Guid OrganizacaoId { get; }
     public Guid ProfissionalId { get; }
     public Guid ServicoId { get; }
-    public NomeCliente Cliente { get; private set; }
+    public PessoaAtendida PessoaAtendida { get; private set; }
     public PeriodoAgendamento Periodo { get; private set; }
     public PrecoServico PrecoCobrado { get; private set; }
-    public TipoAtendimento TipoAtendimento { get; private set; }
+    public LocalAtendimento Local { get; private set; }
+    public TipoAtendimento TipoAtendimento => Local.Tipo;
     public StatusAgendamento Status { get; private set; }
 
     /// <summary>Cria um novo agendamento pendente.</summary>
-    /// <example><code>var agendamento = Agendamento.Criar(organizacaoId, profissionalId, servicoId, cliente, periodo, preco, tipo, provedorDataHora);</code></example>
-    public static Agendamento Criar(Guid organizacaoId, Guid profissionalId, Guid servicoId, NomeCliente cliente, PeriodoAgendamento periodo, PrecoServico precoCobrado, TipoAtendimento tipoAtendimento, IProvedorDataHora provedorDataHora)
+    /// <example><code>var agendamento = Agendamento.Criar(organizacaoId, profissionalId, servicoId, pessoaAtendida, periodo, preco, local, provedorDataHora);</code></example>
+    public static Agendamento Criar(Guid organizacaoId, Guid profissionalId, Guid servicoId, PessoaAtendida pessoaAtendida, PeriodoAgendamento periodo, PrecoServico precoCobrado, LocalAtendimento local, IProvedorDataHora provedorDataHora)
     {
         ValidarReferencias(organizacaoId, profissionalId, servicoId);
         var auditoria = Auditoria.Criar(provedorDataHora);
-        var agendamento = new Agendamento(Guid.NewGuid(), organizacaoId, profissionalId, servicoId, cliente, periodo, precoCobrado, tipoAtendimento, auditoria, StatusAgendamento.Pendente);
+        var agendamento = new Agendamento(
+            Guid.NewGuid(),
+            organizacaoId,
+            profissionalId,
+            servicoId,
+            pessoaAtendida ?? throw new ArgumentNullException(nameof(pessoaAtendida)),
+            periodo ?? throw new ArgumentNullException(nameof(periodo)),
+            precoCobrado ?? throw new ArgumentNullException(nameof(precoCobrado)),
+            local ?? throw new ArgumentNullException(nameof(local)),
+            auditoria,
+            StatusAgendamento.Pendente);
         agendamento.LancarEventoDominio(new AgendamentoCriado(agendamento.Id, organizacaoId, profissionalId, servicoId, auditoria.CriadoEmUtc));
         return agendamento;
     }
 
     /// <summary>Altera os dados de um agendamento que ainda não foi cancelado.</summary>
-    /// <example><code>agendamento.Atualizar(cliente, periodo, preco, tipo, provedorDataHora);</code></example>
+    /// <example><code>agendamento.Atualizar(pessoaAtendida, periodo, preco, local, provedorDataHora);</code></example>
     public void Atualizar(
-        NomeCliente cliente,
+        PessoaAtendida pessoaAtendida,
         PeriodoAgendamento periodo,
         PrecoServico precoCobrado,
-        TipoAtendimento tipoAtendimento,
+        LocalAtendimento local,
         IProvedorDataHora provedorDataHora)
     {
         ExigirNaoCancelado();
-        Cliente = cliente;
-        Periodo = periodo;
-        PrecoCobrado = precoCobrado;
-        TipoAtendimento = tipoAtendimento;
+        PessoaAtendida = pessoaAtendida ?? throw new ArgumentNullException(nameof(pessoaAtendida));
+        Periodo = periodo ?? throw new ArgumentNullException(nameof(periodo));
+        PrecoCobrado = precoCobrado ?? throw new ArgumentNullException(nameof(precoCobrado));
+        Local = local ?? throw new ArgumentNullException(nameof(local));
         Auditoria.Atualizar(provedorDataHora);
     }
 
@@ -99,7 +110,11 @@ public sealed class Agendamento : Entidade, IPertenceOrganizacao
     /// <example><code>var conflita = agendamento.ConflitaCom(outroAgendamento);</code></example>
     public bool ConflitaCom(Agendamento outro)
     {
-        return ProfissionalId == outro.ProfissionalId && Periodo.Sobrepoe(outro.Periodo);
+        ArgumentNullException.ThrowIfNull(outro);
+        return Status != StatusAgendamento.Cancelado
+            && outro.Status != StatusAgendamento.Cancelado
+            && ProfissionalId == outro.ProfissionalId
+            && Periodo.Sobrepoe(outro.Periodo);
     }
 
     private void ExigirNaoCancelado()

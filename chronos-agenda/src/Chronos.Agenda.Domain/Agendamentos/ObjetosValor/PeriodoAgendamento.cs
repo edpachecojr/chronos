@@ -1,25 +1,22 @@
 using Chronos.Agenda.Domain.Agendamentos.Exceptions;
-using Chronos.Agenda.Domain.Servicos.ObjetosValor;
-
 namespace Chronos.Agenda.Domain.Agendamentos.ObjetosValor;
 
 /// <summary>Representa o intervalo UTC ocupado por um agendamento.</summary>
 public sealed record PeriodoAgendamento
 {
-    public PeriodoAgendamento(DateTime inicioUtc, DuracaoServico duracao)
+    public PeriodoAgendamento(DateTime inicioUtc, DateTime fimUtc)
     {
-        if (inicioUtc.Kind != DateTimeKind.Utc)
-        {
-            throw new InicioAgendamentoNaoEstaEmUtcException(inicioUtc.Kind);
-        }
-
+        ExigirUtc(inicioUtc, nameof(inicioUtc));
+        ExigirUtc(fimUtc, nameof(fimUtc));
+        ExigirFimPosteriorAoInicio(inicioUtc, fimUtc);
         InicioUtc = inicioUtc;
-        Duracao = duracao ?? throw new ArgumentNullException(nameof(duracao));
+        FimUtc = fimUtc;
     }
 
     public DateTime InicioUtc { get; }
-    public DuracaoServico Duracao { get; }
-    public DateTime FimUtc => InicioUtc.Add(Duracao.Valor);
+    public DateTime FimUtc { get; }
+    public TimeSpan Duracao => FimUtc - InicioUtc;
+    public double DuracaoEmMinutos => Duracao.TotalMinutes;
 
     /// <summary>Informa se este período tem algum instante em comum com outro.</summary>
     /// <example><code>var conflita = periodo.Sobrepoe(outroPeriodo);</code></example>
@@ -27,5 +24,21 @@ public sealed record PeriodoAgendamento
     {
         ArgumentNullException.ThrowIfNull(outro);
         return InicioUtc < outro.FimUtc && outro.InicioUtc < FimUtc;
+    }
+
+    private static void ExigirUtc(DateTime dataHora, string nomeParametro)
+    {
+        if (dataHora.Kind != DateTimeKind.Utc)
+        {
+            throw new DataHoraAgendamentoNaoEstaEmUtcException(nomeParametro, dataHora.Kind);
+        }
+    }
+
+    private static void ExigirFimPosteriorAoInicio(DateTime inicioUtc, DateTime fimUtc)
+    {
+        if (fimUtc <= inicioUtc)
+        {
+            throw new FimAgendamentoInvalidoException(inicioUtc, fimUtc);
+        }
     }
 }

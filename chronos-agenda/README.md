@@ -13,10 +13,12 @@ Solução .NET 10 do backend de agendamentos do Chronos.
 ## Modelo inicial
 
 O domínio contém organizações, profissionais, disponibilidades semanais,
-serviços e agendamentos. O intervalo do agendamento é UTC e preserva a duração
-e o preço praticados no momento da reserva. `Agendamento.ConflitaCom` compara
-intervalos para o mesmo profissional; a garantia transacional contra corridas
-de concorrência continua pendente de ADR específico.
+serviços e agendamentos. O período do agendamento é UTC, com início e fim
+explícitos e duração calculada; ele preserva o preço praticado, a pessoa
+atendida e o local conforme a modalidade do serviço no momento da reserva.
+`Agendamento.ConflitaCom` compara intervalos ativos para o mesmo profissional;
+a garantia transacional contra corridas de concorrência continua pendente de ADR
+específico.
 
 A exclusão de agendamentos ainda não foi modelada como exclusão física ou
 lógica, pois a política de retenção é uma decisão futura do ADR 0001.

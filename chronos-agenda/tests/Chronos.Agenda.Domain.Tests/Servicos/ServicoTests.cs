@@ -19,7 +19,7 @@ public sealed class ServicoTests
             new NomeServico("Corte"),
             new DuracaoServico(TimeSpan.FromMinutes(30)),
             new PrecoServico(50m),
-            TipoAtendimento.Presencial,
+            TipoAtendimento.NoEnderecoDoPrestador,
             provedorDataHora);
 
         provedorDataHora.UtcNow = criadoEmUtc.AddMinutes(1);

@@ -13,44 +13,57 @@ public sealed class AgendamentoTests
     private static readonly DateTime AgoraUtc = new(2026, 7, 21, 12, 0, 0, DateTimeKind.Utc);
 
     [Fact]
+    public void Criar_PreservaPessoaPeriodoPrecoELocal()
+    {
+        var periodo = CriarPeriodo(AgoraUtc);
+        var pessoaAtendida = new PessoaAtendida("  Marina Silva  ", TipoPessoaAtendida.Paciente);
+        var local = LocalAtendimento.Domiciliar(new EnderecoAtendimento("  Rua das Flores, 10  "));
+
+        var agendamento = CriarAgendamento(Guid.NewGuid(), periodo, pessoaAtendida, local);
+
+        Assert.Equal("Marina Silva", agendamento.PessoaAtendida.Nome);
+        Assert.Equal(TipoPessoaAtendida.Paciente, agendamento.PessoaAtendida.Tipo);
+        Assert.Equal(periodo, agendamento.Periodo);
+        Assert.Equal(75m, agendamento.PrecoCobrado.Valor);
+        Assert.Equal(TipoAtendimento.Domiciliar, agendamento.TipoAtendimento);
+        Assert.Equal("Rua das Flores, 10", agendamento.Local.Endereco!.Descricao);
+    }
+
+    [Fact]
     public void ConflitaCom_QuandoIntervalosDoMesmoProfissionalSobrepoem_RetornaVerdadeiro()
     {
         var profissionalId = Guid.NewGuid();
-        var primeiro = CriarAgendamento(profissionalId, AgoraUtc);
-        var segundo = CriarAgendamento(profissionalId, AgoraUtc.AddMinutes(30));
+        var primeiro = CriarAgendamento(profissionalId, CriarPeriodo(AgoraUtc));
+        var segundo = CriarAgendamento(profissionalId, CriarPeriodo(AgoraUtc.AddMinutes(30)));
 
-        var conflita = primeiro.ConflitaCom(segundo);
-
-        Assert.True(conflita);
+        Assert.True(primeiro.ConflitaCom(segundo));
     }
 
     [Fact]
     public void ConflitaCom_QuandoIntervalosApenasEncostam_RetornaFalso()
     {
         var profissionalId = Guid.NewGuid();
-        var primeiro = CriarAgendamento(profissionalId, AgoraUtc);
-        var segundo = CriarAgendamento(profissionalId, AgoraUtc.AddHours(1));
+        var primeiro = CriarAgendamento(profissionalId, CriarPeriodo(AgoraUtc));
+        var segundo = CriarAgendamento(profissionalId, CriarPeriodo(AgoraUtc.AddHours(1)));
 
-        var conflita = primeiro.ConflitaCom(segundo);
-
-        Assert.False(conflita);
+        Assert.False(primeiro.ConflitaCom(segundo));
     }
 
     [Fact]
-    public void ConflitaCom_QuandoProfissionaisSaoDiferentes_RetornaFalso()
+    public void ConflitaCom_QuandoUmAgendamentoEstaCancelado_RetornaFalso()
     {
-        var primeiro = CriarAgendamento(Guid.NewGuid(), AgoraUtc);
-        var segundo = CriarAgendamento(Guid.NewGuid(), AgoraUtc.AddMinutes(30));
+        var profissionalId = Guid.NewGuid();
+        var primeiro = CriarAgendamento(profissionalId, CriarPeriodo(AgoraUtc));
+        var segundo = CriarAgendamento(profissionalId, CriarPeriodo(AgoraUtc.AddMinutes(30)));
+        segundo.Cancelar(new FakeProvedorDataHora(AgoraUtc.AddMinutes(1)));
 
-        var conflita = primeiro.ConflitaCom(segundo);
-
-        Assert.False(conflita);
+        Assert.False(primeiro.ConflitaCom(segundo));
     }
 
     [Fact]
     public void Confirmar_QuandoPendente_AlteraStatusEDataDeAtualizacao()
     {
-        var agendamento = CriarAgendamento(Guid.NewGuid(), AgoraUtc);
+        var agendamento = CriarAgendamento(Guid.NewGuid(), CriarPeriodo(AgoraUtc));
         var provedorDataHora = new FakeProvedorDataHora(AgoraUtc.AddMinutes(1));
 
         agendamento.Confirmar(provedorDataHora);
@@ -62,10 +75,9 @@ public sealed class AgendamentoTests
     [Fact]
     public void Cancelar_QuandoJaCancelado_LancaExcecaoEspecifica()
     {
-        var agendamento = CriarAgendamento(Guid.NewGuid(), AgoraUtc);
+        var agendamento = CriarAgendamento(Guid.NewGuid(), CriarPeriodo(AgoraUtc));
         var provedorDataHora = new FakeProvedorDataHora(AgoraUtc.AddMinutes(1));
         agendamento.Cancelar(provedorDataHora);
-        provedorDataHora.UtcNow = AgoraUtc.AddMinutes(2);
 
         var excecao = Assert.Throws<AgendamentoCanceladoException>(() => agendamento.Cancelar(provedorDataHora));
 
@@ -75,34 +87,92 @@ public sealed class AgendamentoTests
     [Fact]
     public void Atualizar_QuandoCancelado_LancaExcecaoEspecifica()
     {
-        var agendamento = CriarAgendamento(Guid.NewGuid(), AgoraUtc);
+        var agendamento = CriarAgendamento(Guid.NewGuid(), CriarPeriodo(AgoraUtc));
         var provedorDataHora = new FakeProvedorDataHora(AgoraUtc.AddMinutes(1));
         agendamento.Cancelar(provedorDataHora);
-        provedorDataHora.UtcNow = AgoraUtc.AddMinutes(2);
 
         Assert.Throws<AgendamentoCanceladoException>(() => agendamento.Atualizar(
-            new NomeCliente("Ana Souza"),
+            new PessoaAtendida("Ana Souza", TipoPessoaAtendida.Cliente),
             CriarPeriodo(AgoraUtc.AddHours(2)),
             new PrecoServico(80m),
-            TipoAtendimento.Online,
+            LocalAtendimento.Online(),
             provedorDataHora));
     }
 
-    private static Agendamento CriarAgendamento(Guid profissionalId, DateTime inicioUtc)
+    [Fact]
+    public void PeriodoAgendamento_QuandoValido_CalculaDuracaoEmMinutos()
+    {
+        var periodo = new PeriodoAgendamento(AgoraUtc, AgoraUtc.AddMinutes(45));
+
+        Assert.Equal(TimeSpan.FromMinutes(45), periodo.Duracao);
+        Assert.Equal(45, periodo.DuracaoEmMinutos);
+    }
+
+    [Fact]
+    public void PeriodoAgendamento_QuandoFimNaoEPosteriorAoInicio_LancaExcecaoEspecifica()
+    {
+        Assert.Throws<FimAgendamentoInvalidoException>(() => new PeriodoAgendamento(AgoraUtc, AgoraUtc));
+    }
+
+    [Fact]
+    public void PeriodoAgendamento_QuandoFimNaoEstaEmUtc_LancaExcecaoEspecifica()
+    {
+        var fimLocal = DateTime.SpecifyKind(AgoraUtc.AddHours(1), DateTimeKind.Local);
+
+        var excecao = Assert.Throws<DataHoraAgendamentoNaoEstaEmUtcException>(() => new PeriodoAgendamento(AgoraUtc, fimLocal));
+
+        Assert.Contains("fimUtc", excecao.Message);
+    }
+
+    [Fact]
+    public void LocalAtendimento_Online_NaoPossuiEnderecoFisico()
+    {
+        var local = LocalAtendimento.Online();
+
+        Assert.Null(local.Endereco);
+    }
+
+    [Fact]
+    public void LocalAtendimento_NoEnderecoDoPrestador_PreservaEndereco()
+    {
+        var local = LocalAtendimento.NoEnderecoDoPrestador(new EnderecoAtendimento("Av. Central, 20"));
+
+        Assert.Equal("Av. Central, 20", local.Endereco!.Descricao);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void EnderecoAtendimento_QuandoAusente_LancaExcecaoEspecifica(string descricao)
+    {
+        Assert.Throws<EnderecoAtendimentoInvalidoException>(() => new EnderecoAtendimento(descricao));
+    }
+
+    [Fact]
+    public void PessoaAtendida_QuandoNomeAusente_LancaExcecaoEspecifica()
+    {
+        Assert.Throws<NomePessoaAtendidaInvalidoException>(() => new PessoaAtendida(" ", TipoPessoaAtendida.Outro));
+    }
+
+    private static Agendamento CriarAgendamento(
+        Guid profissionalId,
+        PeriodoAgendamento periodo,
+        PessoaAtendida? pessoaAtendida = null,
+        LocalAtendimento? local = null)
     {
         return Agendamento.Criar(
             Guid.NewGuid(),
             profissionalId,
             Guid.NewGuid(),
-            new NomeCliente("Ana Souza"),
-            CriarPeriodo(inicioUtc),
+            pessoaAtendida ?? new PessoaAtendida("Ana Souza", TipoPessoaAtendida.Cliente),
+            periodo,
             new PrecoServico(75m),
-            TipoAtendimento.Presencial,
+            local ?? LocalAtendimento.NoEnderecoDoPrestador(new EnderecoAtendimento("Rua Exemplo, 1")),
             new FakeProvedorDataHora(AgoraUtc));
     }
 
     private static PeriodoAgendamento CriarPeriodo(DateTime inicioUtc)
     {
-        return new PeriodoAgendamento(inicioUtc, new DuracaoServico(TimeSpan.FromHours(1)));
+        return new PeriodoAgendamento(inicioUtc, inicioUtc.AddHours(1));
     }
 }
