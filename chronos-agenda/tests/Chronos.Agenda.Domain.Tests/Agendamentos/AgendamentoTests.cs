@@ -82,8 +82,7 @@ public sealed class AgendamentoTests
 
     private static Agendamento CriarAgendamento(Guid profissionalId, DateTime inicioUtc)
     {
-        return new Agendamento(
-            Guid.NewGuid(),
+        return Agendamento.Criar(
             Guid.NewGuid(),
             profissionalId,
             Guid.NewGuid(),

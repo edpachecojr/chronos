@@ -6,7 +6,7 @@ namespace Chronos.Agenda.Domain.Agendamentos;
 /// <summary>Representa a reserva de um serviço na agenda de um profissional.</summary>
 public sealed class Agendamento : Entidade, IPertenceOrganizacao
 {
-    public Agendamento(
+    private Agendamento(
         Guid id,
         Guid organizacaoId,
         Guid profissionalId,
@@ -15,18 +15,19 @@ public sealed class Agendamento : Entidade, IPertenceOrganizacao
         PeriodoAgendamento periodo,
         PrecoServico precoCobrado,
         TipoAtendimento tipoAtendimento,
-        DateTime criadoEmUtc)
-        : base(id, criadoEmUtc)
+        DateTime criadoEmUtc,
+        DateTime atualizadoEmUtc,
+        StatusAgendamento status)
+        : base(id, criadoEmUtc, atualizadoEmUtc)
     {
-        ValidarReferencias(organizacaoId, profissionalId, servicoId);
         OrganizacaoId = organizacaoId;
         ProfissionalId = profissionalId;
         ServicoId = servicoId;
-        Cliente = cliente ?? throw new ArgumentNullException(nameof(cliente));
-        Periodo = periodo ?? throw new ArgumentNullException(nameof(periodo));
-        PrecoCobrado = precoCobrado ?? throw new ArgumentNullException(nameof(precoCobrado));
+        Cliente = cliente;
+        Periodo = periodo;
+        PrecoCobrado = precoCobrado;
         TipoAtendimento = tipoAtendimento;
-        Status = StatusAgendamento.Pendente;
+        Status = status;
     }
 
     public Guid OrganizacaoId { get; }
@@ -38,6 +39,22 @@ public sealed class Agendamento : Entidade, IPertenceOrganizacao
     public TipoAtendimento TipoAtendimento { get; private set; }
     public StatusAgendamento Status { get; private set; }
 
+    /// <summary>Cria um novo agendamento pendente.</summary>
+    /// <example><code>var agendamento = Agendamento.Criar(organizacaoId, profissionalId, servicoId, cliente, periodo, preco, tipo, agoraUtc);</code></example>
+    public static Agendamento Criar(Guid organizacaoId, Guid profissionalId, Guid servicoId, NomeCliente cliente, PeriodoAgendamento periodo, PrecoServico precoCobrado, TipoAtendimento tipoAtendimento, DateTime criadoEmUtc)
+    {
+        ValidarCriacao(criadoEmUtc);
+        ValidarReferencias(organizacaoId, profissionalId, servicoId);
+        return new Agendamento(Guid.NewGuid(), organizacaoId, profissionalId, servicoId, cliente, periodo, precoCobrado, tipoAtendimento, criadoEmUtc, criadoEmUtc, StatusAgendamento.Pendente);
+    }
+
+    /// <summary>Reconstitui um agendamento previamente persistido, sem executar regras de criação.</summary>
+    /// <example><code>var agendamento = Agendamento.Reidratar(id, organizacaoId, profissionalId, servicoId, cliente, periodo, preco, tipo, criadoEmUtc, atualizadoEmUtc, status);</code></example>
+    public static Agendamento Reidratar(Guid id, Guid organizacaoId, Guid profissionalId, Guid servicoId, NomeCliente cliente, PeriodoAgendamento periodo, PrecoServico precoCobrado, TipoAtendimento tipoAtendimento, DateTime criadoEmUtc, DateTime atualizadoEmUtc, StatusAgendamento status)
+    {
+        return new Agendamento(id, organizacaoId, profissionalId, servicoId, cliente, periodo, precoCobrado, tipoAtendimento, criadoEmUtc, atualizadoEmUtc, status);
+    }
+
     /// <summary>Altera os dados de um agendamento que ainda não foi cancelado.</summary>
     /// <example><code>agendamento.Atualizar(cliente, periodo, preco, tipo, agoraUtc);</code></example>
     public void Atualizar(
@@ -48,9 +65,9 @@ public sealed class Agendamento : Entidade, IPertenceOrganizacao
         DateTime atualizadoEmUtc)
     {
         ExigirNaoCancelado();
-        Cliente = cliente ?? throw new ArgumentNullException(nameof(cliente));
-        Periodo = periodo ?? throw new ArgumentNullException(nameof(periodo));
-        PrecoCobrado = precoCobrado ?? throw new ArgumentNullException(nameof(precoCobrado));
+        Cliente = cliente;
+        Periodo = periodo;
+        PrecoCobrado = precoCobrado;
         TipoAtendimento = tipoAtendimento;
         RegistrarAtualizacao(atualizadoEmUtc);
     }
@@ -81,7 +98,6 @@ public sealed class Agendamento : Entidade, IPertenceOrganizacao
     /// <example><code>var conflita = agendamento.ConflitaCom(outroAgendamento);</code></example>
     public bool ConflitaCom(Agendamento outro)
     {
-        ArgumentNullException.ThrowIfNull(outro);
         return ProfissionalId == outro.ProfissionalId && Periodo.Sobrepoe(outro.Periodo);
     }
 

@@ -8,8 +8,7 @@ public sealed class DisponibilidadeSemanalTests
     public void Reagendar_AtualizaDiaJanelaEAuditoria()
     {
         var criadoEmUtc = new DateTime(2026, 7, 21, 12, 0, 0, DateTimeKind.Utc);
-        var disponibilidade = new DisponibilidadeSemanal(
-            Guid.NewGuid(),
+        var disponibilidade = DisponibilidadeSemanal.Criar(
             Guid.NewGuid(),
             Guid.NewGuid(),
             DayOfWeek.Monday,

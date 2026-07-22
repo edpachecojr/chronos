@@ -9,8 +9,7 @@ public sealed class ServicoTests
     public void Atualizar_SubstituiConfiguracaoComercial()
     {
         var criadoEmUtc = new DateTime(2026, 7, 21, 12, 0, 0, DateTimeKind.Utc);
-        var servico = new Servico(
-            Guid.NewGuid(),
+        var servico = Servico.Criar(
             Guid.NewGuid(),
             Guid.NewGuid(),
             new NomeServico("Corte"),

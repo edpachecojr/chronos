@@ -5,20 +5,20 @@ namespace Chronos.Agenda.Domain.Disponibilidades;
 /// <summary>Representa uma janela semanal em que um profissional atende.</summary>
 public sealed class DisponibilidadeSemanal : Entidade, IPertenceOrganizacao
 {
-    public DisponibilidadeSemanal(
+    private DisponibilidadeSemanal(
         Guid id,
         Guid organizacaoId,
         Guid profissionalId,
         DayOfWeek diaDaSemana,
         JanelaHorario janela,
-        DateTime criadoEmUtc)
-        : base(id, criadoEmUtc)
+        DateTime criadoEmUtc,
+        DateTime atualizadoEmUtc)
+        : base(id, criadoEmUtc, atualizadoEmUtc)
     {
-        ValidarPropriedade(organizacaoId, profissionalId);
         OrganizacaoId = organizacaoId;
         ProfissionalId = profissionalId;
         DiaDaSemana = diaDaSemana;
-        Janela = janela ?? throw new ArgumentNullException(nameof(janela));
+        Janela = janela;
     }
 
     public Guid OrganizacaoId { get; }
@@ -26,12 +26,28 @@ public sealed class DisponibilidadeSemanal : Entidade, IPertenceOrganizacao
     public DayOfWeek DiaDaSemana { get; private set; }
     public JanelaHorario Janela { get; private set; }
 
+    /// <summary>Cria uma nova disponibilidade semanal para um profissional.</summary>
+    /// <example><code>var disponibilidade = DisponibilidadeSemanal.Criar(organizacaoId, profissionalId, DayOfWeek.Monday, janela, agoraUtc);</code></example>
+    public static DisponibilidadeSemanal Criar(Guid organizacaoId, Guid profissionalId, DayOfWeek diaDaSemana, JanelaHorario janela, DateTime criadoEmUtc)
+    {
+        ValidarCriacao(criadoEmUtc);
+        ValidarPropriedade(organizacaoId, profissionalId);
+        return new DisponibilidadeSemanal(Guid.NewGuid(), organizacaoId, profissionalId, diaDaSemana, janela, criadoEmUtc, criadoEmUtc);
+    }
+
+    /// <summary>Reconstitui uma disponibilidade previamente persistida, sem executar regras de criação.</summary>
+    /// <example><code>var disponibilidade = DisponibilidadeSemanal.Reidratar(id, organizacaoId, profissionalId, DayOfWeek.Monday, janela, criadoEmUtc, atualizadoEmUtc);</code></example>
+    public static DisponibilidadeSemanal Reidratar(Guid id, Guid organizacaoId, Guid profissionalId, DayOfWeek diaDaSemana, JanelaHorario janela, DateTime criadoEmUtc, DateTime atualizadoEmUtc)
+    {
+        return new DisponibilidadeSemanal(id, organizacaoId, profissionalId, diaDaSemana, janela, criadoEmUtc, atualizadoEmUtc);
+    }
+
     /// <summary>Altera o dia ou a janela de atendimento configurada.</summary>
     /// <example><code>disponibilidade.Reagendar(DayOfWeek.Monday, janela, agoraUtc);</code></example>
     public void Reagendar(DayOfWeek diaDaSemana, JanelaHorario janela, DateTime atualizadoEmUtc)
     {
         DiaDaSemana = diaDaSemana;
-        Janela = janela ?? throw new ArgumentNullException(nameof(janela));
+        Janela = janela;
         RegistrarAtualizacao(atualizadoEmUtc);
     }
 
