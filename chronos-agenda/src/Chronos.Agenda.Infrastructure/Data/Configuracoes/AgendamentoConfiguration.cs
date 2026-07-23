@@ -70,7 +70,6 @@ public sealed class AgendamentoConfiguration : IEntityTypeConfiguration<Agendame
             local.OwnsOne(l => l.Endereco, endereco =>
             {
                 endereco.Property(e => e.Descricao).HasColumnName("local_endereco").HasMaxLength(300).IsRequired(false);
-                endereco.Property<byte?>("_discriminator").IsRequired();
             });
         });
 

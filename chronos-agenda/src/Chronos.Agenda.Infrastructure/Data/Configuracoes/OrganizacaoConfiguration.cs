@@ -22,13 +22,11 @@ public sealed class OrganizacaoConfiguration : IEntityTypeConfiguration<Organiza
         builder.OwnsOne(o => o.EnderecoPrestador, endereco =>
         {
             endereco.Property(e => e.Descricao).HasColumnName("endereco_prestador").HasMaxLength(300).IsRequired(false);
-            endereco.Property<byte?>("_discriminator").IsRequired();
         });
 
         builder.OwnsOne(o => o.FusoHorario, fuso =>
         {
             fuso.Property(f => f.Identificador).HasColumnName("fuso_horario").HasMaxLength(50).IsRequired(false);
-            fuso.Property<byte?>("_discriminator").IsRequired();
         });
 
         builder.OwnsAuditoria();

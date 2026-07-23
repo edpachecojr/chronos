@@ -72,8 +72,8 @@ internal sealed class ProjetorDeAgenda(
     /// local (nunca o inverso, que é ambíguo — ADR pendente #4).</summary>
     private static PeriodoAgendamento IntervaloDeConsultaUtc(DateOnly data)
     {
-        var inicioUtc = data.AddDays(-1).ToDateTime(TimeOnly.MinValue);
-        var fimUtc = data.AddDays(2).ToDateTime(TimeOnly.MinValue);
+        var inicioUtc = DateTime.SpecifyKind(data.AddDays(-1).ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
+        var fimUtc = DateTime.SpecifyKind(data.AddDays(2).ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
         return new PeriodoAgendamento(inicioUtc, fimUtc);
     }
 
