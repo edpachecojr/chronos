@@ -19,6 +19,7 @@ public sealed class MembroOrganizacaoConfiguration : IEntityTypeConfiguration<Me
 
         builder.Property(m => m.UsuarioId).IsRequired();
         builder.Property(m => m.OrganizacaoId).IsRequired();
+        builder.Property(m => m.Papel).HasColumnName("papel").HasConversion<string>().HasMaxLength(20).IsRequired();
         builder.Property(m => m.CriadoEmUtc).HasColumnName("criado_em_utc").IsRequired();
 
         builder.HasIndex(m => m.UsuarioId).IsUnique();

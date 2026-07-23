@@ -1,3 +1,4 @@
+using Chronos.Agenda.Application.Compartilhado;
 using Chronos.Agenda.Application.Compartilhado.Contratos;
 using Chronos.Agenda.Application.Organizacoes.Contratos;
 using Chronos.Agenda.Application.Organizacoes.Erros;
@@ -17,11 +18,10 @@ namespace Chronos.Agenda.Application.Organizacoes.CriarOrganizacao;
 /// <summary>
 /// Executa o onboarding de uma organização (UC01): cria a organização e seu
 /// primeiro profissional na mesma transação e registra o vínculo entre o
-/// usuário autenticado que fez o onboarding e a organização criada
-/// (<see cref="IMembroOrganizacaoRepositorio"/>, ADR 0003). Ainda não atribui
-/// papel de proprietário ao vínculo — o contrato não modela papéis até que um
-/// caso de uso de autorização exija essa distinção (ver
-/// docs/backlog/plano-implementacao-mvp.md, Fase 0).
+/// usuário autenticado que fez o onboarding e a organização criada, com o
+/// papel de proprietário (<see cref="IMembroOrganizacaoRepositorio"/>, ADR
+/// 0003) — quem faz o onboarding sempre passa a administrar a organização
+/// criada.
 /// </summary>
 /// <example><code>
 /// var resultado = await handler.ExecutarAsync(
@@ -85,7 +85,7 @@ public sealed class CriarOrganizacaoHandler(
     {
         await organizacaoRepositorio.AdicionarAsync(organizacao, cancellationToken);
         await profissionalRepositorio.AdicionarAsync(profissional, cancellationToken);
-        await membroOrganizacaoRepositorio.AdicionarAsync(usuarioId, organizacao.Id, cancellationToken);
+        await membroOrganizacaoRepositorio.AdicionarAsync(usuarioId, organizacao.Id, PapelMembroOrganizacao.Proprietario, cancellationToken);
         await unidadeDeTrabalho.SalvarAlteracoesAsync(cancellationToken);
     }
 }

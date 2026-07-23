@@ -1,3 +1,4 @@
+using Chronos.Agenda.Application.Compartilhado;
 using Chronos.Agenda.Application.Organizacoes.CriarOrganizacao;
 using Chronos.Agenda.Application.Tests.Compartilhado.Fakes;
 using Chronos.Agenda.Application.Tests.Organizacoes.Fakes;
@@ -36,9 +37,11 @@ public class CriarOrganizacaoHandlerTests
         var profissionalPersistido = await _profissionalRepositorio.BuscarPorIdAsync(
             resultado.Valor.OrganizacaoId, resultado.Valor.ProfissionalId, CancellationToken.None);
         var organizacaoDoUsuario = await _membroOrganizacaoRepositorio.BuscarOrganizacaoIdDoUsuarioAsync(usuarioId, CancellationToken.None);
+        var papelDoUsuario = await _membroOrganizacaoRepositorio.BuscarPapelDoUsuarioAsync(usuarioId, CancellationToken.None);
         Assert.NotNull(organizacaoPersistida);
         Assert.NotNull(profissionalPersistido);
         Assert.Equal(resultado.Valor.OrganizacaoId, organizacaoDoUsuario);
+        Assert.Equal(PapelMembroOrganizacao.Proprietario, papelDoUsuario);
         Assert.Equal(1, _unidadeDeTrabalho.VezesSalvo);
     }
 

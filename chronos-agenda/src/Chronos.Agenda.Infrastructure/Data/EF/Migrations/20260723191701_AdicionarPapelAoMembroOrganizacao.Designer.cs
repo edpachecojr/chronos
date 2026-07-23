@@ -3,6 +3,7 @@ using System;
 using Chronos.Agenda.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Chronos.Agenda.Infrastructure.Data.EF.Migrations
 {
     [DbContext(typeof(ChronosAgendaDbContext))]
-    partial class ChronosAgendaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260723191701_AdicionarPapelAoMembroOrganizacao")]
+    partial class AdicionarPapelAoMembroOrganizacao
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
