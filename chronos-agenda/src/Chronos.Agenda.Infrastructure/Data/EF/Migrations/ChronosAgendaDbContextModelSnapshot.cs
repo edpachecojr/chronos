@@ -547,6 +547,10 @@ namespace Chronos.Agenda.Infrastructure.Data.EF.Migrations
                                         .HasColumnType("character varying(300)")
                                         .HasColumnName("local_endereco");
 
+                                    b2.Property<byte>("_discriminator")
+                                        .HasColumnType("smallint")
+                                        .HasColumnName("local_endereco__discriminator");
+
                                     b2.HasKey("LocalAtendimentoAgendamentoId");
 
                                     b2.ToTable("agendamentos");
@@ -751,6 +755,10 @@ namespace Chronos.Agenda.Infrastructure.Data.EF.Migrations
                                 .HasColumnType("character varying(300)")
                                 .HasColumnName("endereco_prestador");
 
+                            b1.Property<byte>("_discriminator")
+                                .HasColumnType("smallint")
+                                .HasColumnName("endereco_prestador__discriminator");
+
                             b1.HasKey("OrganizacaoId");
 
                             b1.ToTable("organizacoes");
@@ -770,6 +778,10 @@ namespace Chronos.Agenda.Infrastructure.Data.EF.Migrations
                                 .HasMaxLength(50)
                                 .HasColumnType("character varying(50)")
                                 .HasColumnName("fuso_horario");
+
+                            b1.Property<byte>("_discriminator")
+                                .HasColumnType("smallint")
+                                .HasColumnName("fuso_horario__discriminator");
 
                             b1.HasKey("OrganizacaoId");
 
