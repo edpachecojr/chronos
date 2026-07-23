@@ -3,8 +3,8 @@ using Chronos.Agenda.Domain.Compartilhado.Contratos;
 
 namespace Chronos.Agenda.Api.Extensions;
 
-/// <summary>Registra a composição do contexto do usuário corrente, específica da Api por depender do pipeline
-/// HTTP (ver <see cref="ResolucaoContextoUsuarioMiddleware"/>).</summary>
+/// <summary>Registra os serviços específicos da composição da Api: o contexto do usuário corrente, que depende do
+/// pipeline HTTP (ver <see cref="ResolucaoContextoUsuarioMiddleware"/>).</summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>Registra <see cref="ContextoUsuarioAcessor"/> e expõe <see cref="IContextoUsuario"/> a partir do

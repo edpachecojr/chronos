@@ -5,14 +5,23 @@ Solução .NET 10 do backend de agendamentos do Chronos.
 ## Estrutura
 
 - `src/Chronos.Agenda.Domain`: regras e modelo de negócio sem dependências externas;
-- `src/Chronos.Agenda.Application`: fronteira dos casos de uso; contém os
-  fundamentos transversais (portas de repositório, unidade de trabalho e
-  resolução do tenant corrente) e o primeiro caso de uso implementado, o
-  onboarding de organização (UC01);
-- `src/Chronos.Agenda.Infrastructure`: integrações técnicas, ainda sem implementação;
-- `src/Chronos.Agenda.Api`: host de endpoints, ainda sem endpoints;
+- `src/Chronos.Agenda.Application`: fronteira dos casos de uso (UC01-UC07):
+  portas de repositório, unidade de trabalho, resolução do tenant corrente e
+  os handlers de cada caso de uso, registrados no contêiner de injeção de
+  dependências por `Extensions.AdicionarCasosDeUso`;
+- `src/Chronos.Agenda.Infrastructure`: persistência EF Core/PostgreSQL
+  (`snake_case`), repositórios concretos, unidade de trabalho e autenticação
+  sobre o ASP.NET Core Identity;
+- `src/Chronos.Agenda.Api`: host de endpoints minimalistas, sem controllers
+  (ADR 0001). Cada endpoint implementa `Endpoints.IEndpoint` com um membro
+  estático e é composto, um a um e versionado por prefixo de rota (`v1/...`),
+  em `Endpoints.Endpoint.MapearEndpoints`; falhas esperadas (Result Pattern)
+  são traduzidas para HTTP por `Erros.ResultadoHttpExtensions`, e exceções não
+  tratadas por `ExceptionHandling.TratadorGlobalDeExcecoes`;
 - `tests/Chronos.Agenda.Domain.Tests`: testes unitários do domínio;
-- `tests/Chronos.Agenda.Application.Tests`: testes unitários da aplicação.
+- `tests/Chronos.Agenda.Application.Tests`: testes unitários da aplicação;
+- `tests/Chronos.Agenda.Api.Tests`: testes unitários da Api (tradução de
+  `Resultado`/`Erro` para respostas HTTP).
 
 ## Modelo inicial
 
