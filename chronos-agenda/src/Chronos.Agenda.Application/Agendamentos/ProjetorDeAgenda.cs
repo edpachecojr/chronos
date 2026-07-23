@@ -89,6 +89,7 @@ internal sealed class ProjetorDeAgenda(
         var fimLocal = fusoHorario.ConverterParaLocal(agendamento.Periodo.FimUtc);
         return new PeriodoOcupado(
             agendamento.Id,
+            agendamento.ServicoId,
             TimeOnly.FromDateTime(inicioLocal.DateTime),
             TimeOnly.FromDateTime(fimLocal.DateTime),
             agendamento.Status,

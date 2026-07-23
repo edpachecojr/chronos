@@ -87,6 +87,7 @@ public class ConsultarAgendaDiariaHandlerTests
         Assert.Equal(new TimeOnly(9, 0), agenda.JanelasDisponiveis.Single().Inicio);
         var ocupado = Assert.Single(agenda.PeriodosOcupados);
         Assert.Equal(ativo.Id, ocupado.AgendamentoId);
+        Assert.Equal(ativo.ServicoId, ocupado.ServicoId);
         Assert.Equal(new TimeOnly(10, 0), ocupado.Inicio);
         Assert.Equal(new TimeOnly(10, 50), ocupado.Fim);
         Assert.Equal(StatusAgendamento.Pendente, ocupado.Status);
