@@ -13,7 +13,8 @@ builder.Services
     .AdicionarRepositorios()
     .AdicionarServicoAutenticacao()
     .AdicionarContextoUsuario()
-    .AdicionarCasosDeUso();
+    .AdicionarCasosDeUso()
+    .AdicionarCorsFrontend(builder.Configuration);
 
 builder.Services.AddAuthorization();
 builder.Services.AddProblemDetails();
@@ -23,6 +24,7 @@ builder.Services.ConfigureHttpJsonOptions(opcoes => opcoes.SerializerOptions.Con
 var app = builder.Build();
 
 app.UseExceptionHandler();
+app.UseCors(Chronos.Agenda.Api.Extensions.ServiceCollectionExtensions.PoliticaCorsFrontend);
 app.UseAuthentication();
 app.UsarContextoUsuario();
 app.UseAuthorization();

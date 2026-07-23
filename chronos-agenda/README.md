@@ -36,6 +36,23 @@ específico.
 A exclusão de agendamentos ainda não foi modelada como exclusão física ou
 lógica, pois a política de retenção é uma decisão futura do ADR 0001.
 
+## Executando localmente
+
+A Api precisa de um PostgreSQL acessível e da string de conexão em variável
+de ambiente (nunca em arquivo versionado):
+
+```sh
+export ConnectionStrings__ChronosAgenda="Host=localhost;Port=5432;Database=chronos_agenda;Username=postgres;Password=<senha-local>"
+dotnet ef database update --project src/Chronos.Agenda.Infrastructure --startup-project src/Chronos.Agenda.Api
+dotnet run --project src/Chronos.Agenda.Api
+```
+
+Sobe em `http://localhost:5080` (porta fixada em
+`src/Chronos.Agenda.Api/Properties/launchSettings.json`), com CORS liberado
+para `http://localhost:5173` em desenvolvimento
+(`src/Chronos.Agenda.Api/appsettings.Development.json`). Guia completo,
+incluindo o frontend, no [README raiz](../README.md#executando-localmente).
+
 ## Testes
 
 ```sh

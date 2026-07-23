@@ -19,7 +19,8 @@ public static class Endpoint
         endpoints.MapGroup("v1/organizacoes")
             .WithTags("Organizações")
             .RequireAuthorization()
-            .MapEndpoint<OnboardOrganizacaoEndpoint>();
+            .MapEndpoint<OnboardOrganizacaoEndpoint>()
+            .MapEndpoint<ConsultarOrganizacaoAtualEndpoint>();
 
         endpoints.MapGroup("v1/servicos")
             .WithTags("Serviços")
