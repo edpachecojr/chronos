@@ -61,7 +61,10 @@ ser discutida e atualizada explicitamente, junto com os ADRs afetados.
 
 - Testes devem executar por um único comando, a ser registrado aqui quando a
   estrutura do projeto for criada.
-  - `chronos-app`: `pnpm test` (a partir de `chronos-app/`).
+  - `chronos-app`: `pnpm test` (unitários, a partir de `chronos-app/`).
+  - `chronos-app`: `pnpm test:e2e` (E2E com Playwright; sobe a Api real
+    contra um banco Postgres isolado — ver `chronos-app/playwright.config.ts`
+    e `chronos-app/e2e/global-setup.ts`).
 - Toda nova função deve ter teste. Toda correção de bug deve incluir um teste de
   regressão.
 - Os testes devem seguir F.I.R.S.T.:
