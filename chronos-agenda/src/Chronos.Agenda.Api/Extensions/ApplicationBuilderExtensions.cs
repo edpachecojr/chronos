@@ -14,4 +14,20 @@ public static class ApplicationBuilderExtensions
     {
         return app.UseMiddleware<ResolucaoContextoUsuarioMiddleware>();
     }
+
+    /// <summary>Habilita a documentação interativa do Swagger em desenvolvimento. A interface fica acessível em
+    /// <c>GET /swagger/index.html</c> e o JSON da especificação OpenAPI em <c>GET /swagger/v1/swagger.json</c>.</summary>
+    /// <example><code>if (app.Environment.IsDevelopment())
+    ///     app.UsarSwagger();</code></example>
+    public static IApplicationBuilder UsarSwagger(this IApplicationBuilder app)
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI(opcoes =>
+        {
+            opcoes.RoutePrefix = "swagger";
+            opcoes.SwaggerEndpoint("/swagger/v1/swagger.json", "Chronos Agenda API v1");
+        });
+
+        return app;
+    }
 }

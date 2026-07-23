@@ -14,7 +14,8 @@ builder.Services
     .AdicionarServicoAutenticacao()
     .AdicionarContextoUsuario()
     .AdicionarCasosDeUso()
-    .AdicionarCorsFrontend(builder.Configuration);
+    .AdicionarCorsFrontend(builder.Configuration)
+    .AdicionarSwagger();
 
 builder.Services.AddAuthorization();
 builder.Services.AddProblemDetails();
@@ -28,6 +29,10 @@ app.UseCors(Chronos.Agenda.Api.Extensions.ServiceCollectionExtensions.PoliticaCo
 app.UseAuthentication();
 app.UsarContextoUsuario();
 app.UseAuthorization();
+
+if (app.Environment.IsDevelopment())
+    app.UsarSwagger();
+
 app.MapearEndpoints();
 
 app.Run();
