@@ -26,6 +26,12 @@ yarn.lock
 # Cobertura de testes (@vitest/coverage-v8)
 coverage/
 
+# Artefatos do Playwright (relatórios, traces, screenshots de falha)
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
