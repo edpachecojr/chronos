@@ -1,10 +1,13 @@
+import { Plus } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 
 import { consultarAgendaDiaria, traduzirErroDeAgendamento, type AgendaDiariaResultado } from "@/api/agendamentos"
 import { AgendaDataSeletor } from "@/components/agenda/AgendaDataSeletor"
 import { AgendaDiaGrade } from "@/components/agenda/AgendaDiaGrade"
+import { AgendamentoDialog } from "@/components/agendamentos/AgendamentoDialog"
 import { EstadoCarregando } from "@/components/estado/EstadoCarregando"
 import { EstadoErro } from "@/components/estado/EstadoErro"
+import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/useAuth"
 import { useProfissionalAtual } from "@/hooks/useProfissionalAtual"
 
@@ -22,6 +25,7 @@ export function DashboardPage() {
   const [agenda, setAgenda] = useState<AgendaDiariaResultado | null>(null)
   const [carregandoAgenda, setCarregandoAgenda] = useState(true)
   const [erro, setErro] = useState<string | null>(null)
+  const [dialogAberto, setDialogAberto] = useState(false)
 
   const carregarAgenda = useCallback(async () => {
     if (!accessToken || !profissionalId) {
@@ -45,9 +49,17 @@ export function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Agenda</h1>
-        <p className="text-sm text-muted-foreground">Consulte os agendamentos e a disponibilidade do profissional.</p>
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Agenda</h1>
+          <p className="text-sm text-muted-foreground">Consulte os agendamentos e a disponibilidade do profissional.</p>
+        </div>
+        {profissionalId && (
+          <Button onClick={() => setDialogAberto(true)}>
+            <Plus />
+            Novo agendamento
+          </Button>
+        )}
       </div>
 
       <AgendaDataSeletor data={data} onDataChange={setData} />
@@ -57,6 +69,15 @@ export function DashboardPage() {
       {(erro || erroProfissional) && <EstadoErro mensagem={erro ?? erroProfissional!} aoTentarNovamente={carregarAgenda} />}
 
       {!carregandoAgenda && !erro && !erroProfissional && agenda && <AgendaDiaGrade agenda={agenda} />}
+
+      {profissionalId && (
+        <AgendamentoDialog
+          profissionalId={profissionalId}
+          open={dialogAberto}
+          onOpenChange={setDialogAberto}
+          onSalvo={carregarAgenda}
+        />
+      )}
     </div>
   )
 }

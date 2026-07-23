@@ -1,7 +1,15 @@
 import { describe, expect, it } from "vitest"
 
 import { ErroApi } from "@/api/http"
-import { traduzirErroDeAgendamento } from "@/api/agendamentos"
+import { paraInicioApi, traduzirErroDeAgendamento } from "@/api/agendamentos"
+
+describe("paraInicioApi", () => {
+  it("converte data+hora locais para um instante UTC com offset explícito", () => {
+    const resultado = paraInicioApi("2026-07-27", "10:00")
+    expect(resultado).toBe(new Date("2026-07-27T10:00:00").toISOString())
+    expect(resultado.endsWith("Z")).toBe(true)
+  })
+})
 
 describe("traduzirErroDeAgendamento", () => {
   it("traduz o 409 de perfil operacional não configurado com uma mensagem acionável", () => {
