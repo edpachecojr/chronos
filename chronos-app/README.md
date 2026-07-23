@@ -4,6 +4,18 @@ Frontend do Chronos: React 19, TypeScript, Vite, Tailwind CSS e shadcn/ui.
 
 Gerenciador de pacotes: pnpm (`packageManager` fixado em `package.json`).
 
+## Executando localmente
+
+```sh
+pnpm install
+cp .env.example .env.development   # ajuste VITE_API_BASE_URL se a Api não estiver em localhost:5080
+pnpm dev
+```
+
+Requer a Api do `chronos-agenda` rodando (ver
+[README raiz](../README.md#executando-localmente) para o guia completo,
+incluindo o banco de dados).
+
 ## Comandos
 
 - `pnpm dev` — servidor de desenvolvimento.
