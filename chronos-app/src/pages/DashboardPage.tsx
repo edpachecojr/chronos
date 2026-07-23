@@ -1,10 +1,11 @@
 import { Plus } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 
-import { consultarAgendaDiaria, traduzirErroDeAgendamento, type AgendaDiariaResultado } from "@/api/agendamentos"
+import { consultarAgendaDiaria, traduzirErroDeAgendamento, type AgendaDiariaResultado, type PeriodoOcupado } from "@/api/agendamentos"
 import { AgendaDataSeletor } from "@/components/agenda/AgendaDataSeletor"
 import { AgendaDiaGrade } from "@/components/agenda/AgendaDiaGrade"
 import { AgendamentoDialog } from "@/components/agendamentos/AgendamentoDialog"
+import { ReagendarDialog } from "@/components/agendamentos/ReagendarDialog"
 import { EstadoCarregando } from "@/components/estado/EstadoCarregando"
 import { EstadoErro } from "@/components/estado/EstadoErro"
 import { Button } from "@/components/ui/button"
@@ -26,6 +27,7 @@ export function DashboardPage() {
   const [carregandoAgenda, setCarregandoAgenda] = useState(true)
   const [erro, setErro] = useState<string | null>(null)
   const [dialogAberto, setDialogAberto] = useState(false)
+  const [periodoParaReagendar, setPeriodoParaReagendar] = useState<PeriodoOcupado | null>(null)
 
   const carregarAgenda = useCallback(async () => {
     if (!accessToken || !profissionalId) {
@@ -68,13 +70,25 @@ export function DashboardPage() {
 
       {(erro || erroProfissional) && <EstadoErro mensagem={erro ?? erroProfissional!} aoTentarNovamente={carregarAgenda} />}
 
-      {!carregandoAgenda && !erro && !erroProfissional && agenda && <AgendaDiaGrade agenda={agenda} />}
+      {!carregandoAgenda && !erro && !erroProfissional && agenda && (
+        <AgendaDiaGrade agenda={agenda} onReagendar={setPeriodoParaReagendar} onAtualizado={carregarAgenda} />
+      )}
 
       {profissionalId && (
         <AgendamentoDialog
           profissionalId={profissionalId}
           open={dialogAberto}
           onOpenChange={setDialogAberto}
+          onSalvo={carregarAgenda}
+        />
+      )}
+
+      {profissionalId && (
+        <ReagendarDialog
+          profissionalId={profissionalId}
+          data={data}
+          periodo={periodoParaReagendar}
+          onOpenChange={(aberto) => !aberto && setPeriodoParaReagendar(null)}
           onSalvo={carregarAgenda}
         />
       )}

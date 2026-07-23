@@ -8,11 +8,14 @@ export type JanelaHorario = { inicio: string; fim: string }
 
 export type PeriodoOcupado = {
   agendamentoId: string
+  servicoId: string
   inicio: string
   fim: string
   status: StatusAgendamento
   nomeServico: string
   nomePessoaAtendida: string
+  tipoPessoaAtendida: TipoPessoaAtendida
+  enderecoPessoaAtendida: string | null
 }
 
 export type AgendaDiariaResultado = {
@@ -72,6 +75,46 @@ export async function criarAgendamento(
   })
 }
 
+export type ReagendamentoFormulario = {
+  nomePessoaAtendida: string
+  tipoPessoaAtendida: TipoPessoaAtendida
+  data: string
+  hora: string
+  enderecoPessoaAtendida: string
+}
+
+/** Reagenda um agendamento existente, mantendo profissional e serviço inalterados (UC05). */
+export async function reagendarAgendamento(
+  agendamentoId: string,
+  profissionalId: string,
+  servicoId: string,
+  dados: ReagendamentoFormulario,
+  accessToken: string,
+): Promise<void> {
+  await requisitarApi<void>(`/v1/agendamentos/${agendamentoId}`, {
+    method: "PUT",
+    body: {
+      profissionalId,
+      servicoId,
+      nomePessoaAtendida: dados.nomePessoaAtendida,
+      tipoPessoaAtendida: dados.tipoPessoaAtendida,
+      inicio: paraInicioApi(dados.data, dados.hora),
+      enderecoPessoaAtendida: dados.enderecoPessoaAtendida || null,
+    },
+    accessToken,
+  })
+}
+
+/** Confirma um agendamento pendente (UC06). */
+export async function confirmarAgendamento(agendamentoId: string, accessToken: string): Promise<void> {
+  await requisitarApi<void>(`/v1/agendamentos/${agendamentoId}/confirmacao`, { method: "POST", accessToken })
+}
+
+/** Cancela um agendamento ativo (UC06). */
+export async function cancelarAgendamento(agendamentoId: string, accessToken: string): Promise<void> {
+  await requisitarApi<void>(`/v1/agendamentos/${agendamentoId}/cancelamento`, { method: "POST", accessToken })
+}
+
 const MENSAGENS_ERRO_AGENDAMENTO: Record<string, string> = {
   "Agendamento.PerfilOperacionalNaoConfigurado":
     "A organização ainda não configurou endereço e fuso horário. Acesse Configurações para concluir.",
@@ -84,6 +127,11 @@ const MENSAGENS_ERRO_AGENDAMENTO: Record<string, string> = {
   "Agendamento.PeriodoAtravessaMeiaNoite": "O horário escolhido não pode atravessar a meia-noite.",
   "Agendamento.ConflitoDeAgenda": "Este horário já está ocupado por outro agendamento.",
   "Disponibilidade.ForaDaJanela": "Este horário está fora da disponibilidade configurada para o profissional.",
+  "Agendamento.JaCancelado": "Este agendamento já foi cancelado e não pode ser alterado.",
+  "Agendamento.ConfirmacaoInvalida": "Apenas agendamentos pendentes podem ser confirmados.",
+  "Agendamento.AlteracaoDeProfissionalOuServicoNaoPermitida":
+    "Não é possível trocar o profissional ou o serviço ao reagendar.",
+  "Agendamento.NaoEncontrado": "Este agendamento não foi encontrado.",
 }
 
 /** Traduz falhas dos casos de uso de agendamento (UC04-UC07) para uma mensagem em pt-BR. */

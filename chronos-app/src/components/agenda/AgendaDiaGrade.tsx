@@ -1,4 +1,5 @@
-import type { AgendaDiariaResultado, StatusAgendamento } from "@/api/agendamentos"
+import type { AgendaDiariaResultado, PeriodoOcupado, StatusAgendamento } from "@/api/agendamentos"
+import { AgendaPeriodoActions } from "@/components/agenda/AgendaPeriodoActions"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { EstadoVazio } from "@/components/estado/EstadoVazio"
@@ -15,9 +16,11 @@ function formatarHorario(horario: string): string {
 
 type AgendaDiaGradeProps = {
   agenda: AgendaDiariaResultado
+  onReagendar: (periodo: PeriodoOcupado) => void
+  onAtualizado: () => void
 }
 
-export function AgendaDiaGrade({ agenda }: AgendaDiaGradeProps) {
+export function AgendaDiaGrade({ agenda, onReagendar, onAtualizado }: AgendaDiaGradeProps) {
   const periodos = [...agenda.periodosOcupados].sort((a, b) => a.inicio.localeCompare(b.inicio))
 
   return (
@@ -54,7 +57,14 @@ export function AgendaDiaGrade({ agenda }: AgendaDiaGradeProps) {
                     {periodo.nomeServico} · {periodo.nomePessoaAtendida}
                   </span>
                 </div>
-                <Badge variant={ROTULOS_STATUS[periodo.status].variante}>{ROTULOS_STATUS[periodo.status].rotulo}</Badge>
+                <div className="flex items-center gap-3">
+                  <Badge variant={ROTULOS_STATUS[periodo.status].variante}>{ROTULOS_STATUS[periodo.status].rotulo}</Badge>
+                  <AgendaPeriodoActions
+                    periodo={periodo}
+                    onReagendar={() => onReagendar(periodo)}
+                    onAtualizado={onAtualizado}
+                  />
+                </div>
               </CardContent>
             </Card>
           ))}

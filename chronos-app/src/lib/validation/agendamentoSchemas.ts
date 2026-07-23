@@ -31,3 +31,29 @@ export function criarEsquemaAgendamento(tipoAtendimentoPorServico: Record<string
 }
 
 export type AgendamentoFormValores = z.infer<ReturnType<typeof criarEsquemaAgendamento>>
+
+const CAMPOS_REAGENDAMENTO = {
+  nomePessoaAtendida: CAMPOS_BASE.nomePessoaAtendida,
+  tipoPessoaAtendida: CAMPOS_BASE.tipoPessoaAtendida,
+  data: CAMPOS_BASE.data,
+  hora: CAMPOS_BASE.hora,
+  enderecoPessoaAtendida: CAMPOS_BASE.enderecoPessoaAtendida,
+}
+
+/**
+ * Monta o schema de reagendamento (UC05): sem `servicoId`/`profissionalId`, imutáveis após a criação. `exigeEndereco`
+ * já vem resolvido pelo chamador, que conhece o serviço fixo deste agendamento.
+ */
+export function criarEsquemaReagendamento(exigeEndereco: boolean) {
+  return z.object(CAMPOS_REAGENDAMENTO).superRefine((dados, contexto) => {
+    if (exigeEndereco && dados.enderecoPessoaAtendida.trim().length === 0) {
+      contexto.addIssue({
+        code: "custom",
+        message: "O atendimento domiciliar exige o endereço da pessoa atendida.",
+        path: ["enderecoPessoaAtendida"],
+      })
+    }
+  })
+}
+
+export type ReagendamentoFormValores = z.infer<ReturnType<typeof criarEsquemaReagendamento>>
