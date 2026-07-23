@@ -24,6 +24,9 @@ public sealed class ConsultarOrganizacaoAtualHandler(
         }
 
         var organizacao = await organizacaoRepositorio.BuscarPorIdAsync(organizacaoId, cancellationToken);
-        return organizacao is null ? null : new ConsultarOrganizacaoAtualResultado(organizacao.Id, organizacao.Nome.Valor);
+        return organizacao is null
+            ? null
+            : new ConsultarOrganizacaoAtualResultado(
+                organizacao.Id, organizacao.Nome.Valor, organizacao.EnderecoPrestador?.Descricao, organizacao.FusoHorario?.Identificador);
     }
 }

@@ -26,4 +26,12 @@ internal sealed class FakeServicoRepositorio : IServicoRepositorio
             .SingleOrDefault(s => s.Id == servicoId && s.OrganizacaoId == organizacaoId);
         return Task.FromResult(servico);
     }
+
+    public Task<IReadOnlyCollection<Servico>> BuscarPorProfissionalAsync(Guid organizacaoId, Guid profissionalId, CancellationToken cancellationToken)
+    {
+        var encontrados = _servicos
+            .Where(s => s.OrganizacaoId == organizacaoId && s.ProfissionalId == profissionalId)
+            .ToList();
+        return Task.FromResult<IReadOnlyCollection<Servico>>(encontrados);
+    }
 }

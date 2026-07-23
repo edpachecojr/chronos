@@ -33,6 +33,7 @@ app.UseAuthorization();
 if (app.Environment.IsDevelopment())
     app.UsarSwagger();
 
+app.MapGet("/health", () => Results.Ok()).ExcludeFromDescription();
 app.MapearEndpoints();
 
 app.Run();

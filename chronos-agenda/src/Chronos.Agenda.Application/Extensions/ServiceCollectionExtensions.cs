@@ -6,12 +6,15 @@ using Chronos.Agenda.Application.Agendamentos.CriarAgendamento;
 using Chronos.Agenda.Application.Agendamentos.ReagendarAgendamento;
 using Chronos.Agenda.Application.Disponibilidades.AlterarDisponibilidade;
 using Chronos.Agenda.Application.Disponibilidades.CriarDisponibilidade;
+using Chronos.Agenda.Application.Disponibilidades.ListarDisponibilidades;
 using Chronos.Agenda.Application.Disponibilidades.RemoverDisponibilidade;
 using Chronos.Agenda.Application.Organizacoes.ConfigurarPerfilOperacional;
 using Chronos.Agenda.Application.Organizacoes.ConsultarOrganizacaoAtual;
 using Chronos.Agenda.Application.Organizacoes.CriarOrganizacao;
+using Chronos.Agenda.Application.Profissionais.ListarProfissionais;
 using Chronos.Agenda.Application.Servicos.AtualizarServico;
 using Chronos.Agenda.Application.Servicos.CriarServico;
+using Chronos.Agenda.Application.Servicos.ListarServicos;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Chronos.Agenda.Application.Extensions;
@@ -28,9 +31,12 @@ public static class ServiceCollectionExtensions
         servicos.AddScoped<ConfigurarPerfilOperacionalHandler>();
         servicos.AddScoped<CriarServicoHandler>();
         servicos.AddScoped<AtualizarServicoHandler>();
+        servicos.AddScoped<ListarServicosHandler>();
         servicos.AddScoped<CriarDisponibilidadeHandler>();
         servicos.AddScoped<AlterarDisponibilidadeHandler>();
         servicos.AddScoped<RemoverDisponibilidadeHandler>();
+        servicos.AddScoped<ListarDisponibilidadesHandler>();
+        servicos.AddScoped<ListarProfissionaisHandler>();
         servicos.AddScoped<CriarAgendamentoHandler>();
         servicos.AddScoped<ReagendarAgendamentoHandler>();
         servicos.AddScoped<ConfirmarAgendamentoHandler>();

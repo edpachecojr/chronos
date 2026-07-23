@@ -19,4 +19,12 @@ internal sealed class FakeProfissionalRepositorio : IProfissionalRepositorio
             .SingleOrDefault(p => p.Id == profissionalId && p.OrganizacaoId == organizacaoId);
         return Task.FromResult(profissional);
     }
+
+    public Task<IReadOnlyCollection<Profissional>> BuscarPorOrganizacaoAsync(Guid organizacaoId, CancellationToken cancellationToken)
+    {
+        var encontrados = _profissionais
+            .Where(p => p.OrganizacaoId == organizacaoId)
+            .ToList();
+        return Task.FromResult<IReadOnlyCollection<Profissional>>(encontrados);
+    }
 }

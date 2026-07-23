@@ -2,6 +2,7 @@ using Chronos.Agenda.Api.Endpoints.Agendamentos;
 using Chronos.Agenda.Api.Endpoints.Autenticacao;
 using Chronos.Agenda.Api.Endpoints.Disponibilidades;
 using Chronos.Agenda.Api.Endpoints.Organizacoes;
+using Chronos.Agenda.Api.Endpoints.Profissionais;
 using Chronos.Agenda.Api.Endpoints.Servicos;
 
 namespace Chronos.Agenda.Api.Endpoints;
@@ -27,14 +28,16 @@ public static class Endpoint
             .WithTags("Serviços")
             .RequireAuthorization()
             .MapEndpoint<CriarServicoEndpoint>()
-            .MapEndpoint<AtualizarServicoEndpoint>();
+            .MapEndpoint<AtualizarServicoEndpoint>()
+            .MapEndpoint<ListarServicosEndpoint>();
 
         endpoints.MapGroup("v1/disponibilidades")
             .WithTags("Disponibilidades")
             .RequireAuthorization()
             .MapEndpoint<CriarDisponibilidadeEndpoint>()
             .MapEndpoint<AlterarDisponibilidadeEndpoint>()
-            .MapEndpoint<RemoverDisponibilidadeEndpoint>();
+            .MapEndpoint<RemoverDisponibilidadeEndpoint>()
+            .MapEndpoint<ListarDisponibilidadesEndpoint>();
 
         endpoints.MapGroup("v1/agendamentos")
             .WithTags("Agendamentos")
@@ -43,6 +46,11 @@ public static class Endpoint
             .MapEndpoint<ReagendarAgendamentoEndpoint>()
             .MapEndpoint<ConfirmarAgendamentoEndpoint>()
             .MapEndpoint<CancelarAgendamentoEndpoint>();
+
+        endpoints.MapGroup("v1/profissionais")
+            .WithTags("Profissionais")
+            .RequireAuthorization()
+            .MapEndpoint<ListarProfissionaisEndpoint>();
 
         endpoints.MapGroup("v1/profissionais/{profissionalId:guid}/agenda")
             .WithTags("Agenda")

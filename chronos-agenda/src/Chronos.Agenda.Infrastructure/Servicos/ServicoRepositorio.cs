@@ -29,4 +29,11 @@ public sealed class ServicoRepositorio(ChronosAgendaDbContext dbContext) : IServ
         return await dbContext.Servicos
             .FirstOrDefaultAsync(s => s.Id == servicoId && s.OrganizacaoId == organizacaoId, cancellationToken);
     }
+
+    public async Task<IReadOnlyCollection<Servico>> BuscarPorProfissionalAsync(Guid organizacaoId, Guid profissionalId, CancellationToken cancellationToken)
+    {
+        return await dbContext.Servicos
+            .Where(s => s.OrganizacaoId == organizacaoId && s.ProfissionalId == profissionalId)
+            .ToListAsync(cancellationToken);
+    }
 }

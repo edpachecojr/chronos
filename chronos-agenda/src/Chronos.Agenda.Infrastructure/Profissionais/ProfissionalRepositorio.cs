@@ -19,4 +19,11 @@ public sealed class ProfissionalRepositorio(ChronosAgendaDbContext dbContext) : 
         return await dbContext.Profissionais
             .FirstOrDefaultAsync(p => p.Id == profissionalId && p.OrganizacaoId == organizacaoId, cancellationToken);
     }
+
+    public async Task<IReadOnlyCollection<Profissional>> BuscarPorOrganizacaoAsync(Guid organizacaoId, CancellationToken cancellationToken)
+    {
+        return await dbContext.Profissionais
+            .Where(p => p.OrganizacaoId == organizacaoId)
+            .ToListAsync(cancellationToken);
+    }
 }

@@ -90,6 +90,8 @@ public class ConsultarAgendaDiariaHandlerTests
         Assert.Equal(new TimeOnly(10, 0), ocupado.Inicio);
         Assert.Equal(new TimeOnly(10, 50), ocupado.Fim);
         Assert.Equal(StatusAgendamento.Pendente, ocupado.Status);
+        Assert.Equal("Consulta inicial", ocupado.NomeServico);
+        Assert.Equal("Maria Silva", ocupado.NomePessoaAtendida);
     }
 
     [Fact]
