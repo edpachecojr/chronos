@@ -11,10 +11,10 @@ export function PublicOnlyRoute({ children }: { children: ReactNode }) {
   if (status === "carregando") {
     return <CarregandoSessao />
   }
-  if (status === "autenticado_sem_organizacao") {
+  if (status === "autenticado_onboarding_pendente") {
     return <Navigate to="/onboarding" replace />
   }
-  if (status === "autenticado_com_organizacao") {
+  if (status === "autenticado_onboarding_concluido") {
     return <Navigate to="/" replace />
   }
 

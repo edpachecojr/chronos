@@ -1,10 +1,10 @@
 import { AuthLayout } from "@/components/auth/AuthLayout"
-import { OnboardingForm } from "@/components/auth/OnboardingForm"
+import { OnboardingWizard } from "@/components/auth/onboarding/OnboardingWizard"
 
 export function OnboardingPage() {
   return (
-    <AuthLayout titulo="Configure seu negócio" descricao="Só mais um passo antes de acessar sua agenda.">
-      <OnboardingForm />
+    <AuthLayout titulo="Configure seu negócio" descricao="Só mais alguns passos antes de acessar sua agenda.">
+      <OnboardingWizard />
     </AuthLayout>
   )
 }

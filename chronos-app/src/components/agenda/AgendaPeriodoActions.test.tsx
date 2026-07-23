@@ -16,13 +16,14 @@ const { confirmarAgendamento, cancelarAgendamento } = await import("@/api/agenda
 
 function contextoAutenticado(): AuthContextValue {
   return {
-    status: "autenticado_com_organizacao",
+    status: "autenticado_onboarding_concluido",
     organizacao: null,
     accessToken: "token-de-teste",
     profissionalId: "prof-1",
     entrar: vi.fn(),
     registrar: vi.fn(),
     completarOnboarding: vi.fn(),
+    refrescarOrganizacao: vi.fn(),
     sair: vi.fn(),
   }
 }

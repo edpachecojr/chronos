@@ -6,8 +6,8 @@ import type { OnboardOrganizacaoEntrada, OrganizacaoAtual } from "@/api/organiza
 export type StatusSessao =
   | "carregando"
   | "nao_autenticado"
-  | "autenticado_sem_organizacao"
-  | "autenticado_com_organizacao"
+  | "autenticado_onboarding_pendente"
+  | "autenticado_onboarding_concluido"
 
 export type AuthContextValue = {
   status: StatusSessao
@@ -17,6 +17,7 @@ export type AuthContextValue = {
   entrar: (dados: LoginEntrada) => Promise<void>
   registrar: (dados: RegistrarUsuarioEntrada) => Promise<void>
   completarOnboarding: (dados: OnboardOrganizacaoEntrada) => Promise<void>
+  refrescarOrganizacao: () => Promise<void>
   sair: () => void
 }
 

@@ -14,7 +14,7 @@ export function OnboardingRoute({ children }: { children: ReactNode }) {
   if (status === "nao_autenticado") {
     return <Navigate to="/login" replace />
   }
-  if (status === "autenticado_com_organizacao") {
+  if (status === "autenticado_onboarding_concluido") {
     return <Navigate to="/" replace />
   }
 

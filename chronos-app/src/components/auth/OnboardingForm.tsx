@@ -67,7 +67,7 @@ export function OnboardingForm() {
           )}
         />
         <Button type="submit" disabled={form.formState.isSubmitting} className="w-full">
-          {form.formState.isSubmitting ? "Concluindo..." : "Concluir"}
+          {form.formState.isSubmitting ? "Salvando..." : "Continuar"}
         </Button>
       </form>
     </Form>

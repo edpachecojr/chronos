@@ -4,18 +4,16 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 
 import {
-  ROTULOS_DIA_DA_SEMANA,
   alterarDisponibilidade,
   criarDisponibilidade,
   traduzirErroDeDisponibilidade,
   type DisponibilidadeResumo,
 } from "@/api/disponibilidades"
+import { DisponibilidadeCampos } from "@/components/disponibilidade/DisponibilidadeCampos"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Form } from "@/components/ui/form"
 import { useAuth } from "@/hooks/useAuth"
 import { esquemaDisponibilidade, type DisponibilidadeFormValores } from "@/lib/validation/disponibilidadeSchemas"
 
@@ -92,58 +90,7 @@ export function DisponibilidadeDialog({
                 <AlertDescription>{erro}</AlertDescription>
               </Alert>
             )}
-            <FormField
-              control={form.control}
-              name="diaDaSemana"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Dia da semana</FormLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecione o dia" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {Object.entries(ROTULOS_DIA_DA_SEMANA).map(([valor, rotulo]) => (
-                        <SelectItem key={valor} value={valor}>
-                          {rotulo}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="inicio"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Início</FormLabel>
-                    <FormControl>
-                      <Input type="time" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="fim"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Fim</FormLabel>
-                    <FormControl>
-                      <Input type="time" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <DisponibilidadeCampos control={form.control} />
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancelar

@@ -3,7 +3,9 @@
 - Status: levantamento do estado real do backend, para orientar a integração
   com `chronos-app`.
 - Atualizado em: 2026-07-23 (gap de leitura de UC02/UC03/UC04/UC07 fechado
-  durante a implementação da Seção 1 do roadmap de páginas/componentes).
+  durante a implementação da Seção 1 do roadmap de páginas/componentes;
+  `GET /v1/organizacoes/atual` ganhou `possuiDisponibilidade`/`possuiServico`
+  para sustentar o wizard de onboarding de 4 etapas no `chronos-app`).
 - Fonte: leitura direta do código em `chronos-agenda/src` e
   `chronos-agenda/tests` (160/160 testes passando), cruzada com
   `docs/backlog/dominio.md` e `docs/backlog/plano-implementacao-mvp.md`.

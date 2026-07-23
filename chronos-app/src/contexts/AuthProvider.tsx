@@ -10,6 +10,7 @@ import {
 } from "@/api/organizacoes"
 import { gravarSessaoArmazenada, lerSessaoArmazenada, limparSessaoArmazenada } from "@/api/tokenStorage"
 import { AuthContext, type StatusSessao } from "@/contexts/AuthContext"
+import { resolverEtapaOnboarding } from "@/lib/onboarding/etapas"
 
 /** Provê a sessão do usuário autenticado (tokens, organização) a toda a árvore, persistindo-a em `localStorage`. */
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -32,7 +33,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const org = await consultarOrganizacaoAtual(token)
       setOrganizacao(org)
-      setStatus(org ? "autenticado_com_organizacao" : "autenticado_sem_organizacao")
+      const etapa = resolverEtapaOnboarding(org)
+      setStatus(etapa === "concluido" ? "autenticado_onboarding_concluido" : "autenticado_onboarding_pendente")
     } catch (erro) {
       if (erro instanceof ErroApi && erro.status === 401) {
         sair()
@@ -40,6 +42,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       throw erro
     }
+  }
+
+  async function refrescarOrganizacao() {
+    if (!accessToken) {
+      return
+    }
+    await sincronizarOrganizacao(accessToken)
   }
 
   async function entrar(dados: LoginEntrada) {
@@ -58,9 +67,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error("É necessário estar autenticado para concluir o onboarding.")
     }
     const resultado = await onboardOrganizacao(dados, accessToken)
-    setOrganizacao({ organizacaoId: resultado.organizacaoId, nome: dados.nome, enderecoPrestador: null, fusoHorario: null })
     setProfissionalId(resultado.profissionalId)
-    setStatus("autenticado_com_organizacao")
+    await sincronizarOrganizacao(accessToken)
   }
 
   function sair() {
@@ -73,7 +81,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ status, organizacao, accessToken, profissionalId, entrar, registrar, completarOnboarding, sair }}
+      value={{
+        status,
+        organizacao,
+        accessToken,
+        profissionalId,
+        entrar,
+        registrar,
+        completarOnboarding,
+        refrescarOrganizacao,
+        sair,
+      }}
     >
       {children}
     </AuthContext.Provider>

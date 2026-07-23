@@ -13,13 +13,14 @@ const { listarProfissionais } = await import("@/api/profissionais")
 
 function contextoComToken(accessToken: string | null): AuthContextValue {
   return {
-    status: "autenticado_com_organizacao",
+    status: "autenticado_onboarding_concluido",
     organizacao: null,
     accessToken,
     profissionalId: null,
     entrar: vi.fn(),
     registrar: vi.fn(),
     completarOnboarding: vi.fn(),
+    refrescarOrganizacao: vi.fn(),
     sair: vi.fn(),
   }
 }

@@ -14,7 +14,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   if (status === "nao_autenticado") {
     return <Navigate to="/login" replace />
   }
-  if (status === "autenticado_sem_organizacao") {
+  if (status === "autenticado_onboarding_pendente") {
     return <Navigate to="/onboarding" replace />
   }
 

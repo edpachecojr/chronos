@@ -2,7 +2,9 @@
 
 - Status: levantamento do estado real do frontend, para orientar a
   integração com os casos de uso já expostos pelo backend.
-- Atualizado em: 2026-07-23 (Seção 1 implementada de ponta a ponta).
+- Atualizado em: 2026-07-23 (Seção 1 implementada de ponta a ponta; onboarding
+  evoluído de passo único para wizard de 4 etapas, e `ConfiguracoesPage`
+  implementada).
 - Fonte: leitura direta do código em `chronos-app/src` (rotas, páginas,
   componentes, camada `src/api`), cruzada com
   `docs/backlog/roadmap-casos-de-uso.md`.
@@ -21,8 +23,15 @@ tratamento de erro/loading)
 (token em `localStorage`, redireciona conforme
 autenticado/com organização/sem organização)
 
-3 - UC01 Onboard organização: página e formulário (`OnboardingPage`,
-`OnboardingForm`) - Concluído (integrado a `POST /v1/organizacoes`)
+3 - UC01 Onboard organização: wizard de 4 etapas (`OnboardingPage`,
+`OnboardingWizard`) - Concluído (organização/profissional via `OnboardingForm`
++ `POST /v1/organizacoes/`; fuso horário e endereço opcional via
+`EtapaFusoHorario` + `PUT /v1/organizacoes/perfil-operacional`; disponibilidade
+via `EtapaDisponibilidade`; primeiro serviço via `EtapaServico`. A etapa atual
+é derivada dos dados já persistidos — `resolverEtapaOnboarding`, sem um campo
+de progresso à parte —, então o wizard sempre retoma no ponto certo após
+recarregar a página. `GET /v1/organizacoes/atual` ganhou `possuiDisponibilidade`/
+`possuiServico` para sustentar essa derivação)
 
 4 - Shell autenticado (`AppLayout`, `AppSidebar`, header com menu de perfil
 e ação de sair) - Concluído (navegação real; sidebar responsiva com drawer
@@ -78,10 +87,9 @@ para o detalhe do que foi fechado no backend.
 ## Seção 2 — Demais páginas, dialogs e componentes
 
 1 - Página `ConfiguracoesPage` (perfil operacional: endereço/fuso horário
-da organização) - Não implementada (texto placeholder; backend já expõe
-leitura — `enderecoPrestador`/`fusoHorario` em `GET /v1/organizacoes/atual`
-— e escrita — `PUT /v1/organizacoes/perfil-operacional` —, faltando só a
-página)
+da organização) - Concluído (reaproveita `PerfilOperacionalCampos`, o mesmo
+componente de campos da etapa de fuso horário do onboarding, pré-preenchido
+com os dados atuais da organização)
 
 2 - Fluxo de refresh token - Não implementado (token é armazenado mas
 nunca usado; um 401 apenas desloga o usuário)
@@ -106,11 +114,12 @@ componentes documentados)
 `.stories.tsx`)
 
 9 - Componentes shadcn/ui necessários para o MVP: `dialog`, `alert-dialog`,
-`table`, `calendar`, `popover`, `sonner`, `switch` - Concluído (7
+`table`, `calendar`, `popover`, `sonner`, `switch`, `progress` - Concluído (8
 componentes documentados, mesmo padrão do item 7; `date-picker` não é um
 componente próprio do shadcn — implementado como composição local de
-`popover`+`calendar` em `AgendaDataSeletor`; `sheet`/`tabs` seguem sem uso
-no MVP)
+`popover`+`calendar` em `AgendaDataSeletor`; `progress` sustenta o indicador
+de etapa do wizard de onboarding (`OnboardingProgresso`); `sheet`/`tabs`
+seguem sem uso no MVP)
 
 10 - Landing page pública - Não implementada (a rota raiz `/` já é a área
 logada; não há página de marketing/apresentação do produto)
