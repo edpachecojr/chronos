@@ -63,13 +63,18 @@ export async function criarAgendamentoViaApi(
   return (await resposta.json()) as { agendamentoId: string }
 }
 
-/** Próxima segunda-feira a partir de hoje, em `"yyyy-MM-dd"` — mesmo dia da semana da disponibilidade fixa do cenário. */
-export function proximaSegundaIso(): string {
+/** Próxima ocorrência (sempre futura, nunca hoje) do `diaDaSemana` informado (0 = domingo .. 6 = sábado), em `"yyyy-MM-dd"`. */
+export function proximoDiaDaSemanaIso(diaDaSemana: number): string {
   const hoje = new Date()
-  const diferenca = (1 - hoje.getDay() + 7) % 7 || 7
+  const diferenca = (diaDaSemana - hoje.getDay() + 7) % 7 || 7
   const data = new Date(hoje)
   data.setDate(hoje.getDate() + diferenca)
   return data.toISOString().slice(0, 10)
+}
+
+/** Próxima segunda-feira a partir de hoje, em `"yyyy-MM-dd"` — mesmo dia da semana da disponibilidade fixa do cenário. */
+export function proximaSegundaIso(): string {
+  return proximoDiaDaSemanaIso(1)
 }
 
 /** Quantidade de dias entre hoje e a data informada, para navegar a agenda com o botão "Próximo dia". */
