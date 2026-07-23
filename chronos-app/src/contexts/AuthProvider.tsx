@@ -16,6 +16,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<StatusSessao>("carregando")
   const [organizacao, setOrganizacao] = useState<OrganizacaoAtual | null>(null)
   const [accessToken, setAccessToken] = useState<string | null>(null)
+  const [profissionalId, setProfissionalId] = useState<string | null>(null)
 
   useEffect(() => {
     const sessao = lerSessaoArmazenada()
@@ -57,7 +58,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error("É necessário estar autenticado para concluir o onboarding.")
     }
     const resultado = await onboardOrganizacao(dados, accessToken)
-    setOrganizacao({ organizacaoId: resultado.organizacaoId, nome: dados.nome })
+    setOrganizacao({ organizacaoId: resultado.organizacaoId, nome: dados.nome, enderecoPrestador: null, fusoHorario: null })
+    setProfissionalId(resultado.profissionalId)
     setStatus("autenticado_com_organizacao")
   }
 
@@ -65,11 +67,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     limparSessaoArmazenada()
     setAccessToken(null)
     setOrganizacao(null)
+    setProfissionalId(null)
     setStatus("nao_autenticado")
   }
 
   return (
-    <AuthContext.Provider value={{ status, organizacao, entrar, registrar, completarOnboarding, sair }}>
+    <AuthContext.Provider
+      value={{ status, organizacao, accessToken, profissionalId, entrar, registrar, completarOnboarding, sair }}
+    >
       {children}
     </AuthContext.Provider>
   )

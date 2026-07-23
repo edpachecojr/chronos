@@ -12,6 +12,8 @@ export type StatusSessao =
 export type AuthContextValue = {
   status: StatusSessao
   organizacao: OrganizacaoAtual | null
+  accessToken: string | null
+  profissionalId: string | null
   entrar: (dados: LoginEntrada) => Promise<void>
   registrar: (dados: RegistrarUsuarioEntrada) => Promise<void>
   completarOnboarding: (dados: OnboardOrganizacaoEntrada) => Promise<void>

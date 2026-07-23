@@ -4,7 +4,12 @@ export type OnboardOrganizacaoEntrada = { nome: string; nomeProfissionalInicial:
 
 export type OnboardOrganizacaoResultado = { organizacaoId: string; profissionalId: string }
 
-export type OrganizacaoAtual = { organizacaoId: string; nome: string }
+export type OrganizacaoAtual = {
+  organizacaoId: string
+  nome: string
+  enderecoPrestador: string | null
+  fusoHorario: string | null
+}
 
 const MENSAGENS_ERRO_ONBOARDING: Record<string, string> = {
   "Organizacao.NomeInvalido": "Informe um nome de negócio válido (até 120 caracteres).",
