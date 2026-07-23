@@ -31,7 +31,7 @@ detalha a execução do backlog já priorizado lá.
 
 | UC | Caso de uso | Domínio hoje | Gap de domínio |
 | --- | --- | --- | --- |
-| UC01 | Onboard organização | `Organizacao.Criar`/`Renomear`/`ConfigurarPerfilOperacional`, `Profissional.Criar`/`Renomear` | Sem gap de domínio. O vínculo usuário↔organização (proprietário) não é modelado no domínio (ADR 0003); falta a associação em Application/Infra e a implementação de `IContextoUsuario` (ver Fase A item 4 e **[ADR pendente #2]**) |
+| UC01 | Onboard organização | `Organizacao.Criar`/`Renomear`/`ConfigurarPerfilOperacional`, `Profissional.Criar`/`Renomear` | Sem gap de domínio. O vínculo usuário↔organização (proprietário) não é modelado no domínio (ADR 0003) — é resolvido em Application/Infra por `PapelMembroOrganizacao`, já implementado (ver Fase A item 4) |
 | UC02 | Configurar disponibilidade | `DisponibilidadeSemanal.Criar`/`Reagendar`, `JanelaHorario` valida início<fim, `DisponibilidadeSemanal.ConflitaCom`/`JanelaHorario.Sobrepoe` (Fase B item 8) | Sem gap de domínio. A checagem de sobreposição existe no domínio; falta só a aplicação consultá-la ao criar/alterar (ver UC02 na seção 3) |
 | UC03 | Gerir serviço | `Servico.Criar`/`Atualizar` completo, `DuracaoServico`, `PrecoServico`, `NomeServico` validados | Nenhum gap. O snapshot comercial já existe em `Agendamento` (Fase B item 7) |
 | UC04 | Criar agendamento | `Agendamento.Criar` (com `NomeServicoContratado`/`DuracaoReservada`), `PeriodoAgendamento.APartirDaDuracao` (RN05), `VerificadorCompatibilidadeLocal` (RN06) e `VerificadorDisponibilidade` (RN07) — Fase B itens 5–9 | Sem gap de domínio. Falta apenas orquestrar essas peças e validar serviço×profissional×organização (RN04) na aplicação (ver UC04 na seção 3) |
@@ -233,13 +233,12 @@ Antes de qualquer caso de uso:
   `FakeMembroOrganizacaoRepositorio`, novo `FakeUnidadeDeTrabalho`) cobrindo o
   caminho de sucesso e as duas falhas de nome inválido, incluindo a ausência
   de persistência quando a validação falha.
-- **Pendente, não bloqueado — decisão explícita adiada, não um gap de
-  implementação:** o vínculo registrado não carrega papel de proprietário,
-  porque `IMembroOrganizacaoRepositorio` ainda não modela papéis (decisão da
-  Fase 0, reafirmada aqui). Quando um caso de uso de autorização exigir
-  distinguir proprietário de outros papéis, o contrato precisará crescer
-  (ex.: parâmetro de papel em `AdicionarAsync`) e este caso de uso precisará
-  passá-lo.
+- ✅ O vínculo registrado carrega o papel de proprietário: `AdicionarAsync`
+  recebe um `PapelMembroOrganizacao` (`Application.Compartilhado`), e
+  `CriarOrganizacaoHandler` sempre passa `PapelMembroOrganizacao.Proprietario`
+  — quem faz o onboarding administra a organização criada. Nenhum caso de uso
+  ainda consome esse papel para restringir uma ação (autorização por papel
+  segue pendente, ver `docs/backlog/roadmap-casos-de-uso.md` seção 2, item 8).
 - **Fora do escopo de Application, bloqueado por [ADR pendente #2]:** a
   origem real do `UsuarioId` (extração do usuário autenticado do
   ASP.NET Core Identity/HTTP na Api) e a implementação concreta de

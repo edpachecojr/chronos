@@ -13,6 +13,13 @@ internal sealed class FakeOrganizacaoRepositorio : IOrganizacaoRepositorio
         return Task.CompletedTask;
     }
 
+    public Task AtualizarAsync(Organizacao organizacao, CancellationToken cancellationToken)
+    {
+        var indice = _organizacoes.FindIndex(o => o.Id == organizacao.Id);
+        _organizacoes[indice] = organizacao;
+        return Task.CompletedTask;
+    }
+
     public Task<Organizacao?> BuscarPorIdAsync(Guid organizacaoId, CancellationToken cancellationToken)
     {
         var organizacao = _organizacoes.SingleOrDefault(o => o.Id == organizacaoId);

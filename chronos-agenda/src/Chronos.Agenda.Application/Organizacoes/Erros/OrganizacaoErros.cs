@@ -13,4 +13,10 @@ public static class OrganizacaoErros
     public static Erro NaoEncontrada(Guid organizacaoId) => new(
         "Organizacao.NaoEncontrada",
         $"Nenhuma organização {organizacaoId} foi encontrada.");
+
+    /// <summary>O endereço do prestador informado para o perfil operacional é inválido (comprimento fora do limite).</summary>
+    public static Erro EnderecoInvalido(string mensagem) => new("Organizacao.EnderecoInvalido", mensagem);
+
+    /// <summary>O fuso horário informado para o perfil operacional não é um identificador IANA reconhecido.</summary>
+    public static Erro FusoHorarioInvalido(string mensagem) => new("Organizacao.FusoHorarioInvalido", mensagem);
 }

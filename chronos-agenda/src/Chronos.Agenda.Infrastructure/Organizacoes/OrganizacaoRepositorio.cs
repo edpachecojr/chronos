@@ -13,6 +13,16 @@ public sealed class OrganizacaoRepositorio(ChronosAgendaDbContext dbContext) : I
         await dbContext.Organizacoes.AddAsync(organizacao, cancellationToken);
     }
 
+    public Task AtualizarAsync(Organizacao organizacao, CancellationToken cancellationToken)
+    {
+        if (dbContext.Entry(organizacao).State == EntityState.Detached)
+        {
+            dbContext.Organizacoes.Update(organizacao);
+        }
+
+        return Task.CompletedTask;
+    }
+
     public async Task<Organizacao?> BuscarPorIdAsync(Guid organizacaoId, CancellationToken cancellationToken)
     {
         return await dbContext.Organizacoes

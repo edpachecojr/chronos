@@ -7,6 +7,7 @@ using Chronos.Agenda.Application.Agendamentos.ReagendarAgendamento;
 using Chronos.Agenda.Application.Disponibilidades.AlterarDisponibilidade;
 using Chronos.Agenda.Application.Disponibilidades.CriarDisponibilidade;
 using Chronos.Agenda.Application.Disponibilidades.RemoverDisponibilidade;
+using Chronos.Agenda.Application.Organizacoes.ConfigurarPerfilOperacional;
 using Chronos.Agenda.Application.Organizacoes.ConsultarOrganizacaoAtual;
 using Chronos.Agenda.Application.Organizacoes.CriarOrganizacao;
 using Chronos.Agenda.Application.Servicos.AtualizarServico;
@@ -24,6 +25,7 @@ public static class ServiceCollectionExtensions
     {
         servicos.AddScoped<CriarOrganizacaoHandler>();
         servicos.AddScoped<ConsultarOrganizacaoAtualHandler>();
+        servicos.AddScoped<ConfigurarPerfilOperacionalHandler>();
         servicos.AddScoped<CriarServicoHandler>();
         servicos.AddScoped<AtualizarServicoHandler>();
         servicos.AddScoped<CriarDisponibilidadeHandler>();

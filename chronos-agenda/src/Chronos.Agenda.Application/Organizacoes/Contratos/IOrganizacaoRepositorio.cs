@@ -8,6 +8,9 @@ public interface IOrganizacaoRepositorio
     /// <summary>Persiste uma nova organização.</summary>
     Task AdicionarAsync(Organizacao organizacao, CancellationToken cancellationToken);
 
+    /// <summary>Persiste o perfil operacional (endereço do prestador e fuso horário) atualizado de uma organização.</summary>
+    Task AtualizarAsync(Organizacao organizacao, CancellationToken cancellationToken);
+
     /// <summary>Busca uma organização pelo identificador, que é o próprio limite de tenant (RN01).</summary>
     Task<Organizacao?> BuscarPorIdAsync(Guid organizacaoId, CancellationToken cancellationToken);
 }

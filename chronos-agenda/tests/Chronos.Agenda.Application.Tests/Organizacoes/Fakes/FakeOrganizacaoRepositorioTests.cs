@@ -27,4 +27,17 @@ public class FakeOrganizacaoRepositorioTests
 
         Assert.Null(encontrada);
     }
+
+    [Fact]
+    public async Task AtualizarAsync_substitui_a_organizacao_persistida_pelo_mesmo_identificador()
+    {
+        var organizacao = Organizacao.Criar(new NomeOrganizacao("Clínica Exemplo"), _provedorDataHora);
+        await _repositorio.AdicionarAsync(organizacao, CancellationToken.None);
+        organizacao.ConfigurarPerfilOperacional(null, new FusoHorario("America/Sao_Paulo"), _provedorDataHora);
+
+        await _repositorio.AtualizarAsync(organizacao, CancellationToken.None);
+
+        var encontrada = await _repositorio.BuscarPorIdAsync(organizacao.Id, CancellationToken.None);
+        Assert.Equal("America/Sao_Paulo", encontrada!.FusoHorario!.Identificador);
+    }
 }

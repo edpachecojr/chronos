@@ -1,7 +1,7 @@
 # Domínio do Chronos
 
 - Status: backlog de produto e domínio
-- Atualizado em: 2026-07-22
+- Atualizado em: 2026-07-23
 - Escopo: Chronos Agenda
 
 ## Visão e fronteira do domínio
@@ -45,7 +45,7 @@ aplicável.
 
 | Elemento | Estado atual e responsabilidade |
 | --- | --- |
-| `Organizacao` | Limite do tenant, com nome e possibilidade de renomeação. Ainda não possui endereço, fuso horário, perfil, proprietário nem vínculo com autenticação. |
+| `Organizacao` | Limite do tenant, com nome, possibilidade de renomeação e perfil operacional opcional (endereço do prestador e fuso horário IANA) via `ConfigurarPerfilOperacional`, exposto em produção por `PUT /v1/organizacoes/perfil-operacional`. O vínculo usuário↔organização (fora do domínio, ADR 0003) registra o papel de proprietário desde o onboarding. |
 | `Profissional` | Pertence a uma organização e possui nome de exibição. Pode ser renomeado. |
 | `Servico` | Pertence à organização e ao profissional; possui nome, duração de 1 minuto a 12 horas, preço não negativo em reais (até duas casas) e modalidade. Pode ser atualizado. |
 | `DisponibilidadeSemanal` | Pertence à organização e ao profissional; armazena dia da semana e uma `JanelaHorario` contínua, cujo fim deve ser posterior ao início. Pode ser reagendada. |
@@ -64,10 +64,15 @@ O estado atual também já expressa estas regras locais:
   sobrepõem; um cancelado não ocupa a agenda;
 - a auditoria não pode retroceder e recebe o horário por um provedor explícito.
 
-O repositório ainda está na fundação do domínio: `Application` e
-`Infrastructure` não possuem casos de uso ou persistência, e a API não expõe
-endpoints. Portanto, nenhum fluxo de produto deve ser considerado entregue
-apenas pela existência dessas entidades.
+`Application`, `Infrastructure` e a Api já implementam casos de uso,
+persistência (EF Core/PostgreSQL) e autenticação (ASP.NET Core Identity) para
+UC01–UC07 de ponta a ponta, com endpoints expostos e testados. O vínculo
+usuário↔organização registra o papel de proprietário desde o onboarding
+(UC01), e `PUT /v1/organizacoes/perfil-operacional` expõe
+`Organizacao.ConfigurarPerfilOperacional` em produção, destravando UC04, UC05
+e UC07 (antes bloqueados, pois toda criação, reagendamento ou consulta de
+agenda falhava sem endereço/fuso horário configurados). Ver
+`docs/backlog/roadmap-casos-de-uso.md` para o detalhamento por caso de uso.
 
 ## Invariantes-alvo do Booking
 
@@ -76,53 +81,57 @@ As já implementadas estão identificadas para separar contrato de intenção.
 
 | ID | Regra | Situação |
 | --- | --- | --- |
-| RN01 | Toda leitura e escrita é restrita explicitamente à organização corrente; referências cruzadas entre tenants são rejeitadas. | Parcial: há `OrganizacaoId` nas entidades pertinentes, mas falta aplicação, persistência e autorização. |
-| RN02 | Um agendamento ativo não se sobrepõe a outro agendamento ativo do mesmo profissional. Intervalos que apenas encostam são válidos. | Parcial: cálculo puro implementado; consulta, bloqueio transacional e proteção contra concorrência pendentes. |
+| RN01 | Toda leitura e escrita é restrita explicitamente à organização corrente; referências cruzadas entre tenants são rejeitadas. | Implementada: `ResolucaoContextoUsuarioMiddleware` resolve a organização corrente do usuário autenticado (`membros_organizacao`) e todos os handlers restringem consultas e escritas a ela. O vínculo registra o papel de proprietário (`PapelMembroOrganizacao`), mas nenhum endpoint ainda restringe uma ação por papel. |
+| RN02 | Um agendamento ativo não se sobrepõe a outro agendamento ativo do mesmo profissional. Intervalos que apenas encostam são válidos. | Parcial: cálculo, consulta de conflito (`BuscarAtivosSobrepostosAsync`) e persistência implementados na aplicação; falta garantia transacional no PostgreSQL contra concorrência real (ADR pendente #1). |
 | RN03 | O período é armazenado em UTC; o fim é posterior ao início; a duração é derivada do período. | Implementada no domínio. |
-| RN04 | Ao criar ou reagendar, o profissional, o serviço e a disponibilidade consultados pertencem à organização corrente; o serviço pertence ao profissional escolhido. | Pendente: requer caso de uso e repositórios. |
-| RN05 | O período reservado é calculado a partir do início e da duração vigente do serviço. Alteração posterior do catálogo não altera reservas existentes. Exceções manuais de duração, se permitidas, devem ser explícitas e auditáveis. | Pendente: o período é recebido pronto e o agendamento não preserva a duração/nome do serviço. |
-| RN06 | A modalidade e o local do agendamento devem ser compatíveis com o serviço: online não exige endereço físico; domiciliar exige endereço da pessoa atendida; no endereço do prestador usa endereço configurado da organização. | Parcial: `LocalAtendimento` é internamente válido, mas não é comparado ao `Servico` e a organização não tem endereço. |
-| RN07 | Um agendamento novo ou movido precisa estar dentro de uma janela de disponibilidade semanal do profissional, considerada no fuso horário da organização. Exceções devem ser uma capacidade explícita, não um efeito colateral. | Pendente: a disponibilidade existe, mas ainda não participa da decisão de reserva. |
+| RN04 | Ao criar ou reagendar, o profissional, o serviço e a disponibilidade consultados pertencem à organização corrente; o serviço pertence ao profissional escolhido. | Implementada: `AgendamentoPreparador` resolve as referências dentro da organização corrente e valida o vínculo serviço↔profissional. |
+| RN05 | O período reservado é calculado a partir do início e da duração vigente do serviço. Alteração posterior do catálogo não altera reservas existentes. Exceções manuais de duração, se permitidas, devem ser explícitas e auditáveis. | Implementada: `PeriodoAgendamento.APartirDaDuracao` calcula o fim a partir da duração vigente; snapshot `NomeServicoContratado` preserva o nome contratado. Duração manual justificada segue pendente (ADR pendente #5). |
+| RN06 | A modalidade e o local do agendamento devem ser compatíveis com o serviço: online não exige endereço físico; domiciliar exige endereço da pessoa atendida; no endereço do prestador usa endereço configurado da organização. | Implementada: `VerificadorCompatibilidadeLocal` compara modalidade e local na aplicação, e `PUT /v1/organizacoes/perfil-operacional` permite configurar o endereço da organização em produção. |
+| RN07 | Um agendamento novo ou movido precisa estar dentro de uma janela de disponibilidade semanal do profissional, considerada no fuso horário da organização. Exceções devem ser uma capacidade explícita, não um efeito colateral. | Implementada: `VerificadorDisponibilidade` valida a janela no fuso da organização, configurável em produção pelo mesmo endpoint de perfil operacional da RN06. |
 | RN08 | Estados válidos são `Pendente`, `Confirmado` e `Cancelado`. Cancelamento libera o horário; alteração e confirmação após cancelamento são proibidas. | Implementada no domínio. |
 | RN09 | Exclusão não pode apagar silenciosamente histórico operacional. A política será retenção/arquivamento ou exclusão lógica, definida antes de expor a operação. | Pendente; exclusão não está modelada. |
 
 ## Escopo do MVP e backlog priorizado
 
-### Marco 1 — tornar o domínio operável
+### Marco 1 — tornar o domínio operável (concluído)
 
-1. Definir o caso de uso de onboarding: autenticar o usuário, criar a
-   organização, associar seu proprietário e criar o primeiro profissional.
-2. Introduzir perfil operacional da organização: endereço do prestador e fuso
-   horário IANA. O horário de expediente deve ser interpretado nesse fuso;
-   somente o período de reservas é persistido em UTC.
-3. Implementar casos de uso e repositórios explícitos para organização,
+1. ✅ Caso de uso de onboarding implementado: autentica o usuário (ASP.NET
+   Core Identity), cria a organização, o primeiro profissional e registra o
+   papel de proprietário no vínculo usuário↔organização.
+2. ✅ Perfil operacional da organização (endereço do prestador e fuso horário
+   IANA) implementado no domínio via `Organizacao.ConfigurarPerfilOperacional`
+   e exposto em produção por `PUT /v1/organizacoes/perfil-operacional`.
+3. ✅ Casos de uso e repositórios explícitos implementados para organização,
    profissional, serviço, disponibilidade e agendamento, sempre recebendo a
-   organização corrente na fronteira da aplicação.
-4. Expor endpoints autenticados, validação de entrada e Result Pattern para
-   falhas esperadas. Exceções de domínio devem ser convertidas na fronteira da
-   API sem vazar detalhes internos.
-5. Persistir entidades e auditoria no PostgreSQL/EF Core, seguindo as decisões
-   dos ADRs: tabelas plurais em `snake_case` e sem filtro global de tenant.
+   organização corrente na fronteira da aplicação (`IContextoUsuario`).
+4. ✅ Endpoints autenticados, validação de entrada e Result Pattern
+   implementados para falhas esperadas; exceções de domínio são convertidas em
+   `ProblemDetails` na fronteira da Api.
+5. ✅ Entidades e auditoria persistidas no PostgreSQL/EF Core, seguindo os
+   ADRs: tabelas plurais em `snake_case` e sem filtro global de tenant.
 
-### Marco 2 — reserva correta e resistente a concorrência
+### Marco 2 — reserva correta e resistente a concorrência (lógica concluída; falta garantia transacional)
 
-1. Criar o agendamento a partir de `servicoId` e horário inicial; buscar o
-   serviço autorizado e calcular o fim com sua duração. Caso exista ajuste
-   manual, registrar a duração efetivamente reservada e sua justificativa.
-2. Validar a coerência entre serviço, profissional, modalidade e local.
-   Para atendimento no endereço do prestador, copiar o endereço da organização
-   para o agendamento, preservando o snapshot histórico.
-3. Consultar disponibilidade semanal no fuso da organização e garantir que o
-   período inteiro caiba em uma janela. Definir e implementar, como exceção
-   futura controlada, bloqueios pontuais, folgas, feriados e encaixes manuais.
-4. Impedir sobreposição na aplicação e adicionar uma garantia transacional no
-   PostgreSQL contra duas requisições simultâneas. A estratégia (por exemplo,
-   faixa temporal com constraint de exclusão, ou mecanismo equivalente) exige
-   ADR específico antes da implementação.
-5. Implementar atualização/reagendamento como a mesma validação da criação,
-   desconsiderando o próprio agendamento ao procurar conflito.
-6. Implementar confirmação, cancelamento e consulta da agenda diária/semanal,
-   distinguindo reservas pendentes, confirmadas e canceladas.
+1. ✅ Criação do agendamento a partir de `servicoId` e horário inicial
+   implementada; `AgendamentoPreparador` busca o serviço autorizado e calcula
+   o fim com sua duração. Ajuste manual de duração segue fora de escopo (ADR
+   pendente #5).
+2. ✅ Coerência entre serviço, profissional, modalidade e local validada por
+   `VerificadorCompatibilidadeLocal`. A cópia do endereço da organização para
+   atendimento no prestador depende do perfil operacional estar configurado
+   (ver Marco 1, item 2).
+3. ⚠️ Disponibilidade semanal já é consultada no fuso da organização
+   (`VerificadorDisponibilidade`); bloqueios pontuais, folgas, feriados e
+   encaixes manuais seguem fora do escopo do MVP.
+4. ⚠️ Sobreposição impedida na camada de aplicação
+   (`BuscarAtivosSobrepostosAsync`); a garantia transacional no PostgreSQL
+   contra duas requisições simultâneas segue pendente e exige ADR específico
+   antes da implementação (ADR pendente #1).
+5. ✅ Atualização/reagendamento implementado (`ReagendarAgendamentoHandler`),
+   reaproveitando a validação da criação e desconsiderando o próprio
+   agendamento ao procurar conflito.
+6. ✅ Confirmação, cancelamento e consulta da agenda diária/semanal
+   implementados, distinguindo reservas pendentes, confirmadas e canceladas.
 
 ### Marco 3 — experiência de operação
 
@@ -139,15 +148,18 @@ As já implementadas estão identificadas para separar contrato de intenção.
 
 ## Casos de uso do MVP
 
-| ID | Caso de uso | Resultado esperado |
-| --- | --- | --- |
-| UC01 | Onboard organização | Usuário autenticado passa a operar uma organização e seu profissional inicial, isolados de outros tenants. |
-| UC02 | Configurar disponibilidade | Profissional cria, altera e remove janelas semanais; a agenda passa a usar essas janelas para oferta de horários. |
-| UC03 | Gerir serviço | Profissional cria e altera seus serviços com duração, preço e modalidade. Alterações não reescrevem reservas existentes. |
-| UC04 | Criar agendamento | O sistema recebe serviço, profissional, pessoa atendida e horário inicial; calcula o período, resolve o local e persiste somente se todas as regras forem atendidas. |
-| UC05 | Reagendar/editar | O sistema atualiza dados permitidos, revalida disponibilidade e conflito, mantendo a trilha de auditoria. |
-| UC06 | Confirmar/cancelar | O status muda somente em transições permitidas; o cancelamento libera o período para novos agendamentos. |
-| UC07 | Consultar agenda | Profissional visualiza agenda diária e semanal da própria organização, com ocupações e disponibilidade calculada. |
+Ver `docs/backlog/roadmap-casos-de-uso.md` para o roadmap ordenado com status
+detalhado por caso de uso.
+
+| ID | Caso de uso | Resultado esperado | Situação atual |
+| --- | --- | --- | --- |
+| UC01 | Onboard organização | Usuário autenticado passa a operar uma organização e seu profissional inicial, isolados de outros tenants. | Concluído — o vínculo usuário↔organização registra o papel de proprietário. |
+| UC02 | Configurar disponibilidade | Profissional cria, altera e remove janelas semanais; a agenda passa a usar essas janelas para oferta de horários. | Concluído. |
+| UC03 | Gerir serviço | Profissional cria e altera seus serviços com duração, preço e modalidade. Alterações não reescrevem reservas existentes. | Concluído. |
+| UC04 | Criar agendamento | O sistema recebe serviço, profissional, pessoa atendida e horário inicial; calcula o período, resolve o local e persiste somente se todas as regras forem atendidas. | Concluído — `PUT /v1/organizacoes/perfil-operacional` expõe a configuração exigida em produção. |
+| UC05 | Reagendar/editar | O sistema atualiza dados permitidos, revalida disponibilidade e conflito, mantendo a trilha de auditoria. | Concluído. |
+| UC06 | Confirmar/cancelar | O status muda somente em transições permitidas; o cancelamento libera o período para novos agendamentos. | Concluído. |
+| UC07 | Consultar agenda | Profissional visualiza agenda diária e semanal da própria organização, com ocupações e disponibilidade calculada. | Concluído. |
 
 ## Critérios de aceite essenciais
 
