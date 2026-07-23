@@ -93,6 +93,8 @@ public class ConsultarAgendaDiariaHandlerTests
         Assert.Equal(StatusAgendamento.Pendente, ocupado.Status);
         Assert.Equal("Consulta inicial", ocupado.NomeServico);
         Assert.Equal("Maria Silva", ocupado.NomePessoaAtendida);
+        Assert.Equal(TipoPessoaAtendida.Paciente, ocupado.TipoPessoaAtendida);
+        Assert.Null(ocupado.EnderecoPessoaAtendida);
     }
 
     [Fact]

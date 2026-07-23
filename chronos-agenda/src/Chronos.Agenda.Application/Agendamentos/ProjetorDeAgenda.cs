@@ -94,6 +94,8 @@ internal sealed class ProjetorDeAgenda(
             TimeOnly.FromDateTime(fimLocal.DateTime),
             agendamento.Status,
             agendamento.NomeServicoContratado,
-            agendamento.PessoaAtendida.Nome.Valor);
+            agendamento.PessoaAtendida.Nome.Valor,
+            agendamento.PessoaAtendida.Tipo,
+            agendamento.Local.Endereco?.Descricao);
     }
 }
