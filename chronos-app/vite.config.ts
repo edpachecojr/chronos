@@ -15,7 +15,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
     // MVP ainda em uma única página/bundle; revisar quando o roteamento justificar code-splitting por rota.
-    chunkSizeWarningLimit: 600,
+    chunkSizeWarningLimit: 800,
   },
   resolve: {
     alias: {
