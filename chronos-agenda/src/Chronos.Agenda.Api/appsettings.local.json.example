@@ -1,8 +1,5 @@
 {
   "ConnectionStrings": {
     "ChronosAgenda": "Host=localhost;Port=5432;Database=chronos_agenda;Username=postgres;Password=postgres"
-  },
-  "Cors": {
-    "OrigensPermitidas": [ "http://localhost:5173" ]
   }
 }
