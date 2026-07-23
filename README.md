@@ -6,6 +6,32 @@ negócios com poucos funcionários, como barbearias, estúdios de tatuagem,
 manicures, fisioterapeutas, professores particulares, profissionais de dança e
 outros prestadores de serviço.
 
+## 🧪 Projeto de Estudo: Agile Vibecoding
+
+**Este é um projeto de estudo prático de "Agile Vibecoding"** — técnicas avançadas
+de engenharia de software assistida por IA. O desenvolvimento aplica práticas de
+Extreme Programming (XP), testes contínuos, refatoração iterativa e feedback de
+curto ciclo para demonstrar como IA pode acelerar e melhorar a qualidade da
+codificação sem sacrificar rigor arquitetural.
+
+### Princípios adotados
+
+- **Feedback curto:** ciclos de desenvolvimento rápidos com validação contínua
+- **Testes contínuos:** testes unitários, de integração e E2E desde o início
+- **Refatoração disciplinada:** melhorias constantes no código e arquitetura
+- **Engenharia assistida:** uso de IA para geração, revisão e otimização de código
+- **Documentação ativa:** decisões, aprendizados e evoluções registrados em tempo real
+
+### Documentação do projeto
+
+Toda a evolução do projeto está documentada:
+
+- [`CLAUDE.md`](CLAUDE.md) — Regras canônicas de engenharia e padrões adotados
+- [`docs/adr/`](docs/adr) — Architecture Decision Records (decisões técnicas)
+- [`docs/backlog/`](docs/backlog) — Backlog de funcionalidades e roadmap
+- [`docs/backlog/dominio.md`](docs/backlog/dominio.md) — Modelo de domínio e conceitos
+- [`docs/backlog/roadmap-casos-de-uso.md`](docs/backlog/roadmap-casos-de-uso.md) — Evolução planejada
+
 ## Objetivo do produto mínimo viável
 
 O MVP permitirá que um profissional:
