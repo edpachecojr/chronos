@@ -199,4 +199,19 @@
   html {
     @apply font-sans;
     }
+
+  /*
+   * Regra única para todas as micro-animações (animate-in do tw-animate-css,
+   * transições dos componentes shadcn/ui): usuários com prefers-reduced-motion
+   * não devem receber movimento, conforme WCAG 2.3.3. Centralizado aqui em vez
+   * de repetir `motion-reduce:` em cada classe de animação.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+      }
+    }
 }

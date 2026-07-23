@@ -3,7 +3,7 @@ import { LoginForm } from "@/components/auth/LoginForm"
 
 export function LoginPage() {
   return (
-    <AuthLayout titulo="Entrar no Chronos" descricao="Acesse sua conta para gerenciar sua agenda.">
+    <AuthLayout titulo="Login" descricao="Acesse sua conta para gerenciar sua agenda.">
       <LoginForm />
     </AuthLayout>
   )

@@ -35,7 +35,10 @@ export function RegisterForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(aoSubmeter)} className="grid gap-4" noValidate>
         {erro && (
-          <Alert variant="destructive">
+          <Alert
+            variant="destructive"
+            className="animate-in fade-in-0 slide-in-from-top-1 duration-200"
+          >
             <CircleAlert aria-hidden="true" />
             <AlertDescription>{erro}</AlertDescription>
           </Alert>
