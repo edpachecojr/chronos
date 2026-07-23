@@ -18,6 +18,14 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src')
     }
   },
+  server: {
+    /*
+     * Escuta em todas as interfaces (0.0.0.0), não só em 127.0.0.1: no WSL2
+     * com rede em modo NAT, o navegador rodando no Windows não alcança um
+     * servidor que só escuta o loopback dentro da VM do WSL.
+     */
+    host: true,
+  },
   test: {
     projects: [{
       extends: true,
