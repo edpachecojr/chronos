@@ -61,6 +61,7 @@ ser discutida e atualizada explicitamente, junto com os ADRs afetados.
 
 - Testes devem executar por um único comando, a ser registrado aqui quando a
   estrutura do projeto for criada.
+  - `chronos-app`: `pnpm test` (a partir de `chronos-app/`).
 - Toda nova função deve ter teste. Toda correção de bug deve incluir um teste de
   regressão.
 - Os testes devem seguir F.I.R.S.T.:
@@ -92,6 +93,13 @@ ser discutida e atualizada explicitamente, junto com os ADRs afetados.
 - O backend `chronos-agenda` usa `src/Chronos.Agenda.Domain`,
   `src/Chronos.Agenda.Application`, `src/Chronos.Agenda.Infrastructure` e
   `src/Chronos.Agenda.Api`; seus testes ficam em `tests/`.
+- O frontend `chronos-app` (Vite + React + TypeScript, gerenciado com pnpm)
+  organiza `src/components/ui` para os componentes shadcn/ui (gerados e
+  atualizados via `pnpm dlx shadcn add`, não editados manualmente na
+  estrutura) e
+  `src/design-system` para os tokens e sua documentação viva no Storybook
+  (`*.stories.tsx` ao lado de cada componente). Os tokens primitivos e
+  semânticos ficam em `src/index.css`; ver ADR 0007.
 - O domínio não depende das outras camadas. A aplicação depende do domínio; a
   infraestrutura depende da aplicação; e a API depende da aplicação.
 - Siga as convenções dos frameworks escolhidos e mantenha caminhos previsíveis.

@@ -3,3 +3,13 @@
 **/obj/
 **/*.user
 **/appsettings.*.local.json
+
+# Segredos e configuração local, em qualquer app do monorepo. O repositório
+# é público (ver CLAUDE.md): nenhum destes arquivos deve ser versionado.
+**/.env
+**/.env.*
+!**/.env.example
+
+# Sistema operacional
+**/.DS_Store
+**/Thumbs.db

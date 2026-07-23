@@ -50,8 +50,11 @@ parte da primeira entrega:
 - Lucide React.
 
 O backend inicial está em [`chronos-agenda`](chronos-agenda), como uma solução
-.NET 10. As decisões técnicas fundamentais estão registradas em
-[`docs/adr/0001-decisoes-arquiteturais-iniciais.md`](docs/adr/0001-decisoes-arquiteturais-iniciais.md).
+.NET 10, e o frontend inicial está em [`chronos-app`](chronos-app), um projeto
+Vite + React. As decisões técnicas fundamentais estão registradas em
+[`docs/adr/0001-decisoes-arquiteturais-iniciais.md`](docs/adr/0001-decisoes-arquiteturais-iniciais.md)
+e, para o sistema de tokens de design do frontend, em
+[`docs/adr/0007-frontend-chronos-app-e-tokens-de-design.md`](docs/adr/0007-frontend-chronos-app-e-tokens-de-design.md).
 
 ## Diretrizes de engenharia
 
