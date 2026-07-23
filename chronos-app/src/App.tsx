@@ -1,7 +1,11 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
 
+import { AppLayout } from "@/components/layout/AppLayout"
 import { AuthProvider } from "@/contexts/AuthProvider"
+import { ConfiguracoesPage } from "@/pages/ConfiguracoesPage"
 import { DashboardPage } from "@/pages/DashboardPage"
+import { DisponibilidadePage } from "@/pages/DisponibilidadePage"
+import { ServicosPage } from "@/pages/ServicosPage"
 import { LoginPage } from "@/pages/auth/LoginPage"
 import { OnboardingPage } from "@/pages/auth/OnboardingPage"
 import { RegisterPage } from "@/pages/auth/RegisterPage"
@@ -39,13 +43,17 @@ function App() {
             }
           />
           <Route
-            path="/"
             element={
               <ProtectedRoute>
-                <DashboardPage />
+                <AppLayout />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/servicos" element={<ServicosPage />} />
+            <Route path="/disponibilidade" element={<DisponibilidadePage />} />
+            <Route path="/configuracoes" element={<ConfiguracoesPage />} />
+          </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>

@@ -1,4 +1,4 @@
-import { CalendarClock, LogOut } from "lucide-react"
+import { CalendarClock } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -11,20 +11,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { useAuth } from "@/hooks/useAuth"
 
 export function DashboardPage() {
-  const { organizacao, sair } = useAuth()
-
   return (
-    <main className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background p-6">
-      <div className="flex w-full max-w-sm items-center justify-between">
-        <p className="text-sm font-medium text-foreground">{organizacao?.nome}</p>
-        <Button variant="ghost" size="sm" onClick={sair}>
-          <LogOut aria-hidden="true" />
-          Sair
-        </Button>
-      </div>
+    <div className="flex flex-col gap-4">
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Agenda</h1>
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -48,6 +39,6 @@ export function DashboardPage() {
           <Button className="flex-1">Confirmar</Button>
         </CardFooter>
       </Card>
-    </main>
+    </div>
   )
 }

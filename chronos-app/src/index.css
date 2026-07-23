@@ -176,7 +176,17 @@
     --ring: var(--brand-600);
     --radius: 0.625rem;
 
-    --sidebar: var(--neutral-50);
+    /*
+     * --sidebar usa branco puro, igual a --background, em vez de
+     * neutral-50: os dois tons ficam próximos demais para servir como
+     * superfícies visualmente distintas lado a lado (o menu lateral e o
+     * topo da área de conteúdo), criando uma emenda cinza sutil e
+     * indesejada na borda entre eles. O contraste do menu com o conteúdo
+     * vem de --sidebar-border, não de uma diferença de fundo; neutral-50
+     * fica reservado para o fundo da própria área de conteúdo (--muted),
+     * onde os Cards brancos precisam se destacar.
+     */
+    --sidebar: var(--background);
     --sidebar-foreground: var(--neutral-900);
     --sidebar-primary: var(--brand-600);
     --sidebar-primary-foreground: #ffffff;
