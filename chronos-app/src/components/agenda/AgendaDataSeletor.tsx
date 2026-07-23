@@ -11,6 +11,10 @@ type AgendaDataSeletorProps = {
   onDataChange: (data: Date) => void
 }
 
+function comPrimeiraLetraMaiuscula(texto: string): string {
+  return texto.charAt(0).toUpperCase() + texto.slice(1)
+}
+
 export function AgendaDataSeletor({ data, onDataChange }: AgendaDataSeletorProps) {
   function deslocarDias(quantidade: number) {
     const novaData = new Date(data)
@@ -26,12 +30,12 @@ export function AgendaDataSeletor({ data, onDataChange }: AgendaDataSeletorProps
       </Button>
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="min-w-56 justify-start capitalize">
-            {format(data, "EEEE, d 'de' MMMM", { locale: ptBR })}
+          <Button variant="outline" className="min-w-56 justify-start">
+            {comPrimeiraLetraMaiuscula(format(data, "EEEE, d 'de' MMMM", { locale: ptBR }))}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
-          <Calendar mode="single" selected={data} onSelect={(novaData) => novaData && onDataChange(novaData)} />
+          <Calendar mode="single" selected={data} onSelect={(novaData) => novaData && onDataChange(novaData)} locale={ptBR} />
         </PopoverContent>
       </Popover>
       <Button variant="outline" size="icon-sm" onClick={() => deslocarDias(1)}>
